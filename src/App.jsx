@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import heroVideoUrl from './assets/ROVER_scroll.mp4?url'
-import roverVideoUrl from './assets/Mars_rover_moving_202604030727.mp4?url'
+import roverVideoUrl from './assets/Mars_rover_moving_202604030727_scroll.mp4?url'
 import './App.css'
 
 const scrubPortion = 0.72
