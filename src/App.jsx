@@ -54,13 +54,12 @@ function syncVideoFrame(video, duration, targetTime) {
     }
   }
 }
-    // Removed old generated dome stars logic
-const stardomeStars = createStarPoints(240)
 
 function App() {
   const sequenceSectionRef = useRef(null)
   const roverSectionRef = useRef(null)
   const stardomeSectionRef = useRef(null)
+
   const heroVideoRef = useRef(null)
   const roverVideoRef = useRef(null)
   const heroDurationRef = useRef(0)
@@ -68,6 +67,7 @@ function App() {
   const heroTargetTimeRef = useRef(0)
   const roverTargetTimeRef = useRef(0)
   const animationFrameRef = useRef(0)
+
   const [heroVideoReady, setHeroVideoReady] = useState(false)
   const [roverVideoReady, setRoverVideoReady] = useState(false)
   const [heroScrubProgress, setHeroScrubProgress] = useState(0)
@@ -185,10 +185,12 @@ function App() {
   const introTaglineReveal = clamp(1 - heroScrubProgress / 0.36, 0, 1)
   const astrocetReveal = clamp((heroScrubProgress - 0.22) / 0.36, 0, 1)
   const roverTextReveal = clamp((roverScrubProgress - 0.28) / 0.46, 0, 1)
+
   const projectileProgress = clamp(stardomeProgress / 0.56, 0, 1)
-  const domeReveal = clamp((stardomeProgress - 0.18) / 0.72, 0, 1)
-  const parabolaFade = clamp(1 - domeReveal * 1.2, 0, 1)
-  const stardomeTitleReveal = clamp((stardomeProgress - 0.56) / 0.34, 0, 1)
+  const imageReveal = clamp((stardomeProgress - 0.54) / 0.36, 0, 1)
+  const parabolaFade = clamp(1 - imageReveal * 1.25, 0, 1)
+  const stardomeTitleReveal = clamp((stardomeProgress - 0.62) / 0.28, 0, 1)
+  const stardomeImageParallax = (0.5 - stardomeProgress) * 120
 
   const projectileX = 8 + projectileProgress * 84
   const projectileY = 82 - 66 * 4 * projectileProgress * (1 - projectileProgress)
@@ -279,36 +281,20 @@ function App() {
                 top: `${projectileY}%`,
                 opacity: clamp(0.42 + projectileProgress, 0, 1),
               }}
-      const imageReveal = clamp((stardomeProgress - 0.54) / 0.36, 0, 1)
-      const parabolaFade = clamp(1 - imageReveal * 1.25, 0, 1)
-      const stardomeTitleReveal = clamp((stardomeProgress - 0.62) / 0.28, 0, 1)
-      const stardomeImageParallax = (0.5 - stardomeProgress) * 120
+              aria-hidden="true"
+            />
+          </div>
 
           <div
-            className="stardome-dome"
+            className="stardome-image-shell"
             style={{
-              opacity: domeReveal,
-              transform: `translateX(-50%) scale(${0.64 + domeReveal * 0.36})`,
+              opacity: imageReveal,
+              transform: `translateX(-50%) translateY(${stardomeImageParallax}px) scale(${0.82 + imageReveal * 0.18})`,
             }}
             aria-hidden="true"
           >
-            <div className="stardome-dome-grid" />
-            <div className="stardome-stars" style={{ transform: `translateY(${(1 - domeReveal) * 24}px)` }}>
-              {stardomeStars.map((star, index) => (
-                <span
-                  key={`${index}-${star.x.toFixed(2)}`}
-                  style={{
-                    left: `${star.x}%`,
-                    top: `${star.y}%`,
-                    width: `${star.size}px`,
-                    height: `${star.size}px`,
-                    '--twinkle-base': star.alpha,
-                    '--twinkle-delay': `${star.delay}s`,
-                    '--twinkle-duration': `${star.duration}s`,
-                  }}
-                />
-              ))}
-            </div>
+            <img src={stardomeImageUrl} alt="" />
+            <div className="stardome-image-mask" />
           </div>
 
           <h2
