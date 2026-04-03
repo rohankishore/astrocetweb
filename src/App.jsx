@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import heroVideoUrl from './assets/ROVER_scroll.mp4?url'
 import roverVideoUrl from './assets/Mars_rover_moving_202604030727_scroll.mp4?url'
+import stardomeImageUrl from './image 1.png'
 import './App.css'
 
 const scrubPortion = 0.72
@@ -53,25 +54,7 @@ function syncVideoFrame(video, duration, targetTime) {
     }
   }
 }
-
-function createStarPoints(count, seed = 1337) {
-  let state = seed >>> 0
-
-  function nextRandom() {
-    state = (state * 1664525 + 1013904223) >>> 0
-    return state / 4294967296
-  }
-
-  return Array.from({ length: count }, () => ({
-    x: 2 + nextRandom() * 96,
-    y: 2 + nextRandom() * 90,
-    size: 0.7 + nextRandom() * 2,
-    alpha: 0.35 + nextRandom() * 0.65,
-    delay: nextRandom() * 3.2,
-    duration: 2.2 + nextRandom() * 3.6,
-  }))
-}
-
+    // Removed old generated dome stars logic
 const stardomeStars = createStarPoints(240)
 
 function App() {
@@ -296,9 +279,10 @@ function App() {
                 top: `${projectileY}%`,
                 opacity: clamp(0.42 + projectileProgress, 0, 1),
               }}
-              aria-hidden="true"
-            />
-          </div>
+      const imageReveal = clamp((stardomeProgress - 0.54) / 0.36, 0, 1)
+      const parabolaFade = clamp(1 - imageReveal * 1.25, 0, 1)
+      const stardomeTitleReveal = clamp((stardomeProgress - 0.62) / 0.28, 0, 1)
+      const stardomeImageParallax = (0.5 - stardomeProgress) * 120
 
           <div
             className="stardome-dome"
