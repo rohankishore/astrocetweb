@@ -269,7 +269,6 @@ function App() {
               <path
                 pathLength="1"
                 d="M 8 78 A 42 42 0 1 1 92 78"
-                style={{ strokeDasharray: 1, strokeDashoffset: 1 - circlePathReveal }}
               />
             </svg>
           </div>
