@@ -1,3 +1,6 @@
+/* dread it, run from it, destiny arrives all the same */
+
+
 @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&display=swap');
 
 .app-shell {
@@ -38,6 +41,9 @@
   pointer-events: none;
   z-index: 1;
 }
+
+/* can i code happiness tho? */
+
 
 .club-intro-text,
 .astrocet-title-text {

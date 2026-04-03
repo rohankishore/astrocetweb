@@ -1,3 +1,6 @@
+/* man its so hard not to act rekless */
+
+
 import { useEffect, useRef, useState } from 'react'
 import heroVideoUrl from './assets/ROVER_scroll.mp4?url'
 import roverVideoUrl from './assets/Mars_rover_moving_202604030727_scroll.mp4?url'
@@ -37,6 +40,9 @@ function syncVideoFrame(video, duration, targetTime) {
   if (!video || duration <= 0) {
     return
   }
+
+  /* sadhanam kayyilundoooo???? */
+
 
   const safeDuration = Math.max(duration - 0.001, 0)
   const target = clamp(targetTime, 0, safeDuration)
