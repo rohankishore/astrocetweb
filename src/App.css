@@ -232,8 +232,7 @@
 .stardome-rover-gap {
   min-height: 34svh;
   position: relative;
-  background:
-    linear-gradient(to bottom, #000 0%, #010101 44%, #030202 100%);
+  background: #000;
   overflow: hidden;
 }
 
