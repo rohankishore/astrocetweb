@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Bebas+Neue&display=swap');
+
+.app-shell {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+}
+
+.sequence-section {
+  min-height: 430svh;
+  position: relative;
+  background: #000;
+}
+
+.sequence-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: #000;
+}
+
+.sequence-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  will-change: transform;
+  filter: saturate(0.92) contrast(1.03) brightness(0.82);
+}
+
+.sequence-shade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.64));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.club-intro-text,
+.astrocet-title-text {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity 220ms linear, transform 260ms ease;
+}
+
+.club-intro-text {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: clamp(2rem, 2.4vw, 2rem);
+  font-family: 'Bebas Neue', 'Segoe UI', sans-serif;
+  color: rgba(232, 244, 255, 0.92);
+  text-shadow: 0 0 18px rgba(182, 223, 255, 0.45);
+}
+
+.astrocet-title-text {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: clamp(3rem, 12vw, 9.5rem);
+  font-family: 'Audiowide', 'Orbitron', sans-serif;
+  color: rgba(247, 251, 255, 0.96);
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.3),
+    0 0 36px rgba(173, 206, 255, 0.34);
+}
+
+.sequence-loading {
+  position: relative;
+  z-index: 4;
+  margin: 0;
+  bottom: clamp(2rem, 4vw, 3.4rem);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: clamp(0.72rem, 1vw, 0.95rem);
+  color: rgba(236, 245, 255, 0.82);
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .sequence-section {
+    min-height: 400svh;
+  }
+}
+
+@media (max-width: 640px) {
+  .club-intro-text {
+    letter-spacing: 0.16em;
+    text-align: center;
+    width: min(90vw, 540px);
+  }
+
+  .astrocet-title-text {
+    letter-spacing: 0.14em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .club-intro-text,
+  .astrocet-title-text {
+    transition: none;
+  }
+}
