@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import scrollVideoUrl from './assets/ROVER_scroll.mp4?url'
-import galaxyBackdropUrl from './assets/galaxy.jpeg'
+import heroVideoUrl from './assets/ROVER_scroll.mp4?url'
+import roverVideoUrl from './assets/Mars_rover_moving_202604030727.mp4?url'
 import './App.css'
 
 const scrubPortion = 0.72
@@ -40,32 +40,60 @@ function getScrollPhases(sectionElement) {
   return { overall, scrub, reveal }
 }
 
+function syncVideoFrame(video, duration, targetTime) {
+  if (!video || duration <= 0) {
+    return
+  }
+
+  const safeDuration = Math.max(duration - 0.001, 0)
+  const target = clamp(targetTime, 0, safeDuration)
+  const delta = target - video.currentTime
+
+  if (Math.abs(delta) > 0.008) {
+    const step = Math.abs(delta) < 0.045 ? delta : delta * 0.22
+    const nextTime = clamp(video.currentTime + step, 0, safeDuration)
+
+    try {
+      video.currentTime = nextTime
+    } catch {
+      // Ignore seek exceptions while the browser is still buffering.
+    }
+  }
+}
+
 function App() {
   const sequenceSectionRef = useRef(null)
-  const galaxySectionRef = useRef(null)
-  const videoRef = useRef(null)
-  const durationRef = useRef(0)
-  const targetTimeRef = useRef(0)
+  const roverSectionRef = useRef(null)
+  const heroVideoRef = useRef(null)
+  const roverVideoRef = useRef(null)
+  const heroDurationRef = useRef(0)
+  const roverDurationRef = useRef(0)
+  const heroTargetTimeRef = useRef(0)
+  const roverTargetTimeRef = useRef(0)
   const animationFrameRef = useRef(0)
-  const [videoReady, setVideoReady] = useState(false)
-  const [scrubProgress, setScrubProgress] = useState(0)
-  const [galaxyProgress, setGalaxyProgress] = useState(0)
+  const [heroVideoReady, setHeroVideoReady] = useState(false)
+  const [roverVideoReady, setRoverVideoReady] = useState(false)
+  const [heroScrubProgress, setHeroScrubProgress] = useState(0)
+  const [roverScrubProgress, setRoverScrubProgress] = useState(0)
 
   useEffect(() => {
     function updateFromScrollPosition() {
-      if (!sequenceSectionRef.current) {
-        return
+      if (sequenceSectionRef.current) {
+        const { scrub } = getScrollPhases(sequenceSectionRef.current)
+        setHeroScrubProgress(scrub)
+
+        if (heroDurationRef.current > 0) {
+          heroTargetTimeRef.current = scrub * heroDurationRef.current
+        }
       }
 
-      const { scrub } = getScrollPhases(sequenceSectionRef.current)
-      setScrubProgress(scrub)
+      if (roverSectionRef.current) {
+        const { scrub } = getScrollPhases(roverSectionRef.current)
+        setRoverScrubProgress(scrub)
 
-      if (durationRef.current > 0) {
-        targetTimeRef.current = scrub * durationRef.current
-      }
-
-      if (galaxySectionRef.current) {
-        setGalaxyProgress(getSectionProgress(galaxySectionRef.current))
+        if (roverDurationRef.current > 0) {
+          roverTargetTimeRef.current = scrub * roverDurationRef.current
+        }
       }
     }
 
@@ -80,89 +108,94 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const video = videoRef.current
-    if (!video) {
-      return
+    const heroVideo = heroVideoRef.current
+    const roverVideo = roverVideoRef.current
+
+    function prepareVideo(video) {
+      video.pause()
+      video.muted = true
+      video.playsInline = true
+      video.preload = 'auto'
     }
 
-    function handleReady() {
-      durationRef.current = video.duration || 0
-      setVideoReady(durationRef.current > 0)
+    function handleHeroReady() {
+      heroDurationRef.current = heroVideo?.duration || 0
+      setHeroVideoReady(heroDurationRef.current > 0)
 
-      if (sequenceSectionRef.current && durationRef.current > 0) {
+      if (sequenceSectionRef.current && heroDurationRef.current > 0) {
         const { scrub } = getScrollPhases(sequenceSectionRef.current)
-        setScrubProgress(scrub)
-        targetTimeRef.current = scrub * durationRef.current
-      }
-
-      if (galaxySectionRef.current) {
-        setGalaxyProgress(getSectionProgress(galaxySectionRef.current))
+        setHeroScrubProgress(scrub)
+        heroTargetTimeRef.current = scrub * heroDurationRef.current
       }
     }
 
-    video.pause()
-    video.muted = true
-    video.playsInline = true
-    video.preload = 'auto'
+    function handleRoverReady() {
+      roverDurationRef.current = roverVideo?.duration || 0
+      setRoverVideoReady(roverDurationRef.current > 0)
 
-    video.addEventListener('loadedmetadata', handleReady)
-    video.addEventListener('canplay', handleReady)
+      if (roverSectionRef.current && roverDurationRef.current > 0) {
+        const { scrub } = getScrollPhases(roverSectionRef.current)
+        setRoverScrubProgress(scrub)
+        roverTargetTimeRef.current = scrub * roverDurationRef.current
+      }
+    }
+
+    if (heroVideo) {
+      prepareVideo(heroVideo)
+      heroVideo.addEventListener('loadedmetadata', handleHeroReady)
+      heroVideo.addEventListener('canplay', handleHeroReady)
+    }
+
+    if (roverVideo) {
+      prepareVideo(roverVideo)
+      roverVideo.addEventListener('loadedmetadata', handleRoverReady)
+      roverVideo.addEventListener('canplay', handleRoverReady)
+    }
 
     return () => {
-      video.removeEventListener('loadedmetadata', handleReady)
-      video.removeEventListener('canplay', handleReady)
+      if (heroVideo) {
+        heroVideo.removeEventListener('loadedmetadata', handleHeroReady)
+        heroVideo.removeEventListener('canplay', handleHeroReady)
+      }
+
+      if (roverVideo) {
+        roverVideo.removeEventListener('loadedmetadata', handleRoverReady)
+        roverVideo.removeEventListener('canplay', handleRoverReady)
+      }
     }
   }, [])
 
   useEffect(() => {
-    function syncVideoToScroll() {
-      const video = videoRef.current
-      if (video && durationRef.current > 0) {
-        const safeDuration = Math.max(durationRef.current - 0.001, 0)
-        const target = clamp(targetTimeRef.current, 0, safeDuration)
-        const delta = target - video.currentTime
+    function syncVideosToScroll() {
+      syncVideoFrame(heroVideoRef.current, heroDurationRef.current, heroTargetTimeRef.current)
+      syncVideoFrame(roverVideoRef.current, roverDurationRef.current, roverTargetTimeRef.current)
 
-        if (Math.abs(delta) > 0.008) {
-          const step = Math.abs(delta) < 0.045 ? delta : delta * 0.22
-          const nextTime = clamp(video.currentTime + step, 0, safeDuration)
-
-          try {
-            video.currentTime = nextTime
-          } catch {
-            // Ignore seek exceptions while the browser is still buffering.
-          }
-        }
-      }
-
-      animationFrameRef.current = window.requestAnimationFrame(syncVideoToScroll)
+      animationFrameRef.current = window.requestAnimationFrame(syncVideosToScroll)
     }
 
-    animationFrameRef.current = window.requestAnimationFrame(syncVideoToScroll)
+    animationFrameRef.current = window.requestAnimationFrame(syncVideosToScroll)
 
     return () => {
       window.cancelAnimationFrame(animationFrameRef.current)
     }
   }, [])
 
-  const introTaglineReveal = clamp(1 - scrubProgress / 0.36, 0, 1)
-  const astrocetReveal = clamp((scrubProgress - 0.22) / 0.36, 0, 1)
-  const galaxyFarShift = (0.5 - galaxyProgress) * 140
-  const galaxyMidShift = (0.5 - galaxyProgress) * 230
-  const galaxyNearShift = (0.5 - galaxyProgress) * 320
-  const galaxyCopyReveal = clamp((galaxyProgress - 0.1) / 0.46, 0, 1)
+  const introTaglineReveal = clamp(1 - heroScrubProgress / 0.36, 0, 1)
+  const astrocetReveal = clamp((heroScrubProgress - 0.22) / 0.36, 0, 1)
+  const roverTextReveal = clamp((roverScrubProgress - 0.28) / 0.46, 0, 1)
 
   return (
     <main className="app-shell">
       <section className="sequence-section" ref={sequenceSectionRef}>
         <div className="sequence-sticky">
           <video
-            ref={videoRef}
+            ref={heroVideoRef}
             className="sequence-video"
-            src={scrollVideoUrl}
+            src={heroVideoUrl}
             muted
             playsInline
             preload="auto"
-            aria-label="Scroll synced rover sequence"
+            aria-label="Scroll synced club hero sequence"
           />
 
           <div className="sequence-shade" aria-hidden="true" />
@@ -171,7 +204,7 @@ function App() {
             className="club-intro-text"
             style={{
               opacity: introTaglineReveal,
-              transform: `translate(-50%, calc(-50% + ${scrubProgress * 34}px))`,
+              transform: `translate(-50%, calc(-50% + ${heroScrubProgress * 34}px))`,
             }}
           >
             CET'S OWN ASTRONOMY CLUB
@@ -187,50 +220,35 @@ function App() {
             ASTROCET
           </h1>
 
-          {!videoReady && <p className="sequence-loading">Loading sequence...</p>}
+          {!heroVideoReady && <p className="sequence-loading">Loading sequence...</p>}
         </div>
       </section>
 
-      <section className="galaxy-parallax-section" ref={galaxySectionRef}>
-        <div className="galaxy-parallax-sticky">
-          <div
-            className="galaxy-layer galaxy-layer-far"
-            style={{
-              transform: `translate3d(0, ${galaxyFarShift}px, 0) scale(${1.16 - galaxyProgress * 0.08})`,
-            }}
-            aria-hidden="true"
-          >
-            <img src={galaxyBackdropUrl} alt="" />
-          </div>
-
-          <div
-            className="galaxy-layer galaxy-layer-mid"
-            style={{
-              transform: `translate3d(0, ${galaxyMidShift}px, 0) scale(${1.24 - galaxyProgress * 0.12})`,
-            }}
-            aria-hidden="true"
-          >
-            <img src={galaxyBackdropUrl} alt="" />
-          </div>
-
-          <div
-            className="galaxy-layer galaxy-layer-near"
-            style={{ transform: `translate3d(0, ${galaxyNearShift}px, 0)` }}
-            aria-hidden="true"
+      <section className="rover-section" ref={roverSectionRef}>
+        <div className="rover-sticky">
+          <video
+            ref={roverVideoRef}
+            className="rover-video"
+            src={roverVideoUrl}
+            muted
+            playsInline
+            preload="auto"
+            aria-label="Scroll synced rover movement sequence"
           />
 
-          <div className="galaxy-vignette" aria-hidden="true" />
+          <div className="sequence-shade" aria-hidden="true" />
 
-          <div
-            className="galaxy-copy"
+          <h2
+            className="rover-title-text"
             style={{
-              opacity: galaxyCopyReveal,
-              transform: `translate(-50%, calc(-50% + ${(1 - galaxyCopyReveal) * 34}px))`,
+              opacity: roverTextReveal,
+              transform: `translate(-50%, calc(-50% + ${(1 - roverTextReveal) * 30}px)) scale(${0.9 + roverTextReveal * 0.1})`,
             }}
           >
-            <p>NEXT TRAJECTORY</p>
-            <h2>Parallax Galaxy Sector</h2>
-          </div>
+            ROVER
+          </h2>
+
+          {!roverVideoReady && <p className="sequence-loading rover-loading">Loading sequence...</p>}
         </div>
       </section>
     </main>
