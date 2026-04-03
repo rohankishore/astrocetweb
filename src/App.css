@@ -127,6 +127,102 @@
   bottom: clamp(1.2rem, 3vw, 2.2rem);
 }
 
+.stardome-section {
+  min-height: 260svh;
+  position: relative;
+  background: #000;
+}
+
+.stardome-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: #000;
+}
+
+.stardome-parabola-shell {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transition: opacity 260ms linear;
+}
+
+.stardome-parabola {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: min(86vw, 1100px);
+  height: min(70vh, 640px);
+  transform: translate(-50%, -50%);
+}
+
+.stardome-parabola path {
+  fill: none;
+  stroke: rgba(241, 248, 255, 0.95);
+  stroke-width: 0.25;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(228, 245, 255, 0.45));
+}
+
+.stardome-projectile {
+  position: absolute;
+  width: clamp(9px, 1vw, 14px);
+  height: clamp(9px, 1vw, 14px);
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 24px rgba(190, 228, 255, 0.55);
+}
+
+.stardome-circle-shell {
+  position: absolute;
+  left: 50%;
+  top: 57%;
+  width: min(90vw, 980px);
+  height: min(68vh, 640px);
+  transform-origin: 50% 100%;
+  z-index: 3;
+  transition: opacity 260ms linear, transform 320ms ease;
+}
+
+.stardome-circle-path {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.stardome-circle-path path {
+  fill: none;
+  stroke: rgba(241, 248, 255, 0.96);
+  stroke-width: 0.3;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  filter:
+    drop-shadow(0 0 7px rgba(228, 245, 255, 0.5))
+    drop-shadow(0 0 22px rgba(170, 209, 255, 0.24));
+}
+
+.stardome-title {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 4;
+  margin: 0;
+  pointer-events: none;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: clamp(2rem, 8.5vw, 7rem);
+  font-family: 'Audiowide', 'Orbitron', sans-serif;
+  color: rgba(246, 251, 255, 0.96);
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.22),
+    0 0 34px rgba(164, 207, 255, 0.28);
+  transition: opacity 220ms linear, transform 260ms ease;
+}
+
 @media (max-width: 900px) {
   .sequence-section {
     min-height: 400svh;
@@ -134,6 +230,10 @@
 
   .rover-section {
     min-height: 250svh;
+  }
+
+  .stardome-section {
+    min-height: 240svh;
   }
 }
 
@@ -152,7 +252,10 @@
 @media (prefers-reduced-motion: reduce) {
   .club-intro-text,
   .astrocet-title-text,
-  .rover-title-text {
+  .rover-title-text,
+  .stardome-parabola-shell,
+  .stardome-circle-shell,
+  .stardome-title {
     transition: none;
   }
 }

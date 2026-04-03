@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import heroVideoUrl from './assets/ROVER_scroll.mp4?url'
 import roverVideoUrl from './assets/Mars_rover_moving_202604030727_scroll.mp4?url'
-import stardomeImageUrl from './image 1.png'
 import './App.css'
 
 const scrubPortion = 0.72
@@ -187,10 +186,10 @@ function App() {
   const roverTextReveal = clamp((roverScrubProgress - 0.28) / 0.46, 0, 1)
 
   const projectileProgress = clamp(stardomeProgress / 0.56, 0, 1)
-  const imageReveal = clamp((stardomeProgress - 0.54) / 0.36, 0, 1)
-  const parabolaFade = clamp(1 - imageReveal * 1.25, 0, 1)
+  const circlePathReveal = clamp((stardomeProgress - 0.54) / 0.36, 0, 1)
+  const parabolaFade = clamp(1 - circlePathReveal * 1.25, 0, 1)
   const stardomeTitleReveal = clamp((stardomeProgress - 0.62) / 0.28, 0, 1)
-  const stardomeImageParallax = (0.5 - stardomeProgress) * 120
+  const stardomePathParallax = (0.5 - stardomeProgress) * 120
 
   const projectileX = 8 + projectileProgress * 84
   const projectileY = 82 - 66 * 4 * projectileProgress * (1 - projectileProgress)
@@ -210,7 +209,6 @@ function App() {
           />
 
           <div className="sequence-shade" aria-hidden="true" />
-
           <p
             className="club-intro-text"
             style={{
@@ -233,6 +231,63 @@ function App() {
 
           {!heroVideoReady && <p className="sequence-loading">Loading sequence...</p>}
         </div>
+      </section>
+
+      <section className="stardome-section" ref={stardomeSectionRef}>
+        <div className="stardome-sticky">
+          <div className="stardome-starfield" aria-hidden="true" />
+
+          <div className="stardome-parabola-shell" style={{ opacity: parabolaFade }}>
+            <svg className="stardome-parabola" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                pathLength="1"
+                d="M 8 82 Q 50 12 92 82"
+                style={{ strokeDasharray: 1, strokeDashoffset: 1 - projectileProgress }}
+              />
+            </svg>
+
+            <div
+              className="stardome-projectile"
+              style={{
+                left: `${projectileX}%`,
+                top: `${projectileY}%`,
+                opacity: clamp(0.42 + projectileProgress, 0, 1),
+              }}
+              aria-hidden="true"
+            />
+          </div>
+
+          <div
+            className="stardome-circle-shell"
+            style={{
+              opacity: circlePathReveal,
+              transform: `translateX(-50%) translateY(${stardomePathParallax}px) scale(${0.82 + circlePathReveal * 0.18})`,
+            }}
+            aria-hidden="true"
+          >
+            <svg className="stardome-circle-path" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path
+                pathLength="1"
+                d="M 8 78 A 42 42 0 1 1 92 78"
+                style={{ strokeDasharray: 1, strokeDashoffset: 1 - circlePathReveal }}
+              />
+            </svg>
+          </div>
+
+          <h2
+            className="stardome-title"
+            style={{
+              opacity: stardomeTitleReveal,
+              transform: `translate(-50%, calc(-50% + ${(1 - stardomeTitleReveal) * 24}px))`,
+            }}
+          >
+            STARDOME
+          </h2>
+        </div>
+      </section>
+
+      <section className="stardome-rover-gap" aria-hidden="true">
+        <div className="stardome-rover-gap-stars" />
       </section>
 
       <section className="rover-section" ref={roverSectionRef}>
@@ -260,52 +315,6 @@ function App() {
           </h2>
 
           {!roverVideoReady && <p className="sequence-loading rover-loading">Loading sequence...</p>}
-        </div>
-      </section>
-
-      <section className="stardome-section" ref={stardomeSectionRef}>
-        <div className="stardome-sticky">
-          <div className="stardome-parabola-shell" style={{ opacity: parabolaFade }}>
-            <svg className="stardome-parabola" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              <path
-                pathLength="1"
-                d="M 8 82 Q 50 12 92 82"
-                style={{ strokeDasharray: 1, strokeDashoffset: 1 - projectileProgress }}
-              />
-            </svg>
-
-            <div
-              className="stardome-projectile"
-              style={{
-                left: `${projectileX}%`,
-                top: `${projectileY}%`,
-                opacity: clamp(0.42 + projectileProgress, 0, 1),
-              }}
-              aria-hidden="true"
-            />
-          </div>
-
-          <div
-            className="stardome-image-shell"
-            style={{
-              opacity: imageReveal,
-              transform: `translateX(-50%) translateY(${stardomeImageParallax}px) scale(${0.82 + imageReveal * 0.18})`,
-            }}
-            aria-hidden="true"
-          >
-            <img src={stardomeImageUrl} alt="" />
-            <div className="stardome-image-mask" />
-          </div>
-
-          <h2
-            className="stardome-title"
-            style={{
-              opacity: stardomeTitleReveal,
-              transform: `translate(-50%, calc(-50% + ${(1 - stardomeTitleReveal) * 24}px))`,
-            }}
-          >
-            STARDOME
-          </h2>
         </div>
       </section>
     </main>
