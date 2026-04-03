@@ -141,6 +141,28 @@
   background: #000;
 }
 
+.stardome-starfield {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 22%, rgba(255, 255, 255, 0.74) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 22% 12%, rgba(233, 220, 255, 0.56) 0 1px, transparent 1.7px),
+    radial-gradient(circle at 38% 28%, rgba(255, 255, 255, 0.68) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 52% 14%, rgba(238, 222, 255, 0.48) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 64% 24%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 78% 18%, rgba(228, 212, 255, 0.52) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 88% 30%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 18% 42%, rgba(255, 255, 255, 0.48) 0 0.9px, transparent 1.6px),
+    radial-gradient(circle at 48% 44%, rgba(235, 219, 255, 0.4) 0 0.9px, transparent 1.6px),
+    radial-gradient(circle at 74% 46%, rgba(255, 255, 255, 0.5) 0 0.9px, transparent 1.6px),
+    radial-gradient(circle at 30% 62%, rgba(255, 255, 255, 0.45) 0 0.9px, transparent 1.6px),
+    radial-gradient(circle at 58% 66%, rgba(233, 217, 255, 0.4) 0 0.9px, transparent 1.6px),
+    radial-gradient(circle at 82% 70%, rgba(255, 255, 255, 0.44) 0 0.9px, transparent 1.6px);
+  opacity: 0.62;
+}
+
 .stardome-parabola-shell {
   position: absolute;
   inset: 0;
@@ -203,7 +225,32 @@
   stroke-linecap: round;
   filter:
     drop-shadow(0 0 7px rgba(228, 245, 255, 0.5))
-    drop-shadow(0 0 22px rgba(170, 209, 255, 0.24));
+    drop-shadow(0 0 16px rgba(192, 145, 255, 0.28))
+    drop-shadow(0 0 26px rgba(166, 116, 255, 0.2));
+}
+
+.stardome-rover-gap {
+  min-height: 34svh;
+  position: relative;
+  background:
+    linear-gradient(to bottom, #000 0%, #010101 44%, #030202 100%);
+  overflow: hidden;
+}
+
+.stardome-rover-gap-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8% 30%, rgba(255, 255, 255, 0.44) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 18% 56%, rgba(230, 211, 255, 0.34) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 31% 38%, rgba(255, 255, 255, 0.42) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 45% 62%, rgba(238, 224, 255, 0.32) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 58% 36%, rgba(255, 255, 255, 0.4) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 70% 58%, rgba(229, 208, 255, 0.34) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 82% 42%, rgba(255, 255, 255, 0.42) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 92% 64%, rgba(225, 204, 255, 0.32) 0 1px, transparent 1.8px);
+  opacity: 0.52;
 }
 
 .stardome-title {
@@ -234,6 +281,10 @@
 
   .stardome-section {
     min-height: 240svh;
+  }
+
+  .stardome-rover-gap {
+    min-height: 30svh;
   }
 }
 
