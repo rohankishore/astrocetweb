@@ -127,6 +127,137 @@
   bottom: clamp(1.2rem, 3vw, 2.2rem);
 }
 
+.stardome-section {
+  min-height: 260svh;
+  position: relative;
+  background: #000;
+}
+
+.stardome-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: #000;
+}
+
+.stardome-parabola-shell {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transition: opacity 260ms linear;
+}
+
+.stardome-parabola {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: min(86vw, 1100px);
+  height: min(70vh, 640px);
+  transform: translate(-50%, -50%);
+}
+
+.stardome-parabola path {
+  fill: none;
+  stroke: rgba(241, 248, 255, 0.95);
+  stroke-width: 0.25;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(228, 245, 255, 0.45));
+}
+
+.stardome-projectile {
+  position: absolute;
+  width: clamp(9px, 1vw, 14px);
+  height: clamp(9px, 1vw, 14px);
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 24px rgba(190, 228, 255, 0.55);
+}
+
+.stardome-dome {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  width: min(92vw, 1200px);
+  aspect-ratio: 2 / 1;
+  transform-origin: 50% 100%;
+  border: 1px solid rgba(223, 240, 255, 0.35);
+  border-bottom: none;
+  border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+  overflow: hidden;
+  z-index: 3;
+  background: radial-gradient(circle at 50% 100%, rgba(9, 18, 46, 0.55), rgba(0, 0, 0, 0.96));
+  box-shadow:
+    inset 0 0 60px rgba(130, 184, 255, 0.08),
+    0 0 36px rgba(142, 188, 255, 0.12);
+  transition: opacity 260ms linear, transform 320ms ease;
+}
+
+.stardome-dome-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-radial-gradient(
+      circle at 50% 100%,
+      rgba(204, 227, 255, 0.12) 0 0.7%,
+      transparent 0.7% 6%
+    ),
+    repeating-conic-gradient(
+      from 180deg at 50% 100%,
+      rgba(204, 227, 255, 0.08) 0 3deg,
+      transparent 3deg 8deg
+    );
+  opacity: 0.48;
+}
+
+.stardome-stars {
+  position: absolute;
+  inset: 0;
+  transition: transform 300ms ease;
+}
+
+.stardome-stars span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  opacity: var(--twinkle-base);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: stardome-twinkle var(--twinkle-duration) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay);
+}
+
+.stardome-title {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 4;
+  margin: 0;
+  pointer-events: none;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: clamp(2rem, 8.5vw, 7rem);
+  font-family: 'Audiowide', 'Orbitron', sans-serif;
+  color: rgba(246, 251, 255, 0.96);
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.22),
+    0 0 34px rgba(164, 207, 255, 0.28);
+  transition: opacity 220ms linear, transform 260ms ease;
+}
+
+@keyframes stardome-twinkle {
+  0%,
+  100% {
+    opacity: var(--twinkle-base);
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 900px) {
   .sequence-section {
     min-height: 400svh;
@@ -134,6 +265,10 @@
 
   .rover-section {
     min-height: 250svh;
+  }
+
+  .stardome-section {
+    min-height: 240svh;
   }
 }
 
@@ -152,7 +287,15 @@
 @media (prefers-reduced-motion: reduce) {
   .club-intro-text,
   .astrocet-title-text,
-  .rover-title-text {
+  .rover-title-text,
+  .stardome-parabola-shell,
+  .stardome-dome,
+  .stardome-stars,
+  .stardome-title {
     transition: none;
+  }
+
+  .stardome-stars span {
+    animation: none;
   }
 }

@@ -54,9 +54,30 @@ function syncVideoFrame(video, duration, targetTime) {
   }
 }
 
+function createStarPoints(count, seed = 1337) {
+  let state = seed >>> 0
+
+  function nextRandom() {
+    state = (state * 1664525 + 1013904223) >>> 0
+    return state / 4294967296
+  }
+
+  return Array.from({ length: count }, () => ({
+    x: 2 + nextRandom() * 96,
+    y: 2 + nextRandom() * 90,
+    size: 0.7 + nextRandom() * 2,
+    alpha: 0.35 + nextRandom() * 0.65,
+    delay: nextRandom() * 3.2,
+    duration: 2.2 + nextRandom() * 3.6,
+  }))
+}
+
+const stardomeStars = createStarPoints(240)
+
 function App() {
   const sequenceSectionRef = useRef(null)
   const roverSectionRef = useRef(null)
+  const stardomeSectionRef = useRef(null)
   const heroVideoRef = useRef(null)
   const roverVideoRef = useRef(null)
   const heroDurationRef = useRef(0)
@@ -68,6 +89,7 @@ function App() {
   const [roverVideoReady, setRoverVideoReady] = useState(false)
   const [heroScrubProgress, setHeroScrubProgress] = useState(0)
   const [roverScrubProgress, setRoverScrubProgress] = useState(0)
+  const [stardomeProgress, setStardomeProgress] = useState(0)
 
   useEffect(() => {
     function updateFromScrollPosition() {
@@ -87,6 +109,10 @@ function App() {
         if (roverDurationRef.current > 0) {
           roverTargetTimeRef.current = scrub * roverDurationRef.current
         }
+      }
+
+      if (stardomeSectionRef.current) {
+        setStardomeProgress(getSectionProgress(stardomeSectionRef.current))
       }
     }
 
@@ -176,6 +202,13 @@ function App() {
   const introTaglineReveal = clamp(1 - heroScrubProgress / 0.36, 0, 1)
   const astrocetReveal = clamp((heroScrubProgress - 0.22) / 0.36, 0, 1)
   const roverTextReveal = clamp((roverScrubProgress - 0.28) / 0.46, 0, 1)
+  const projectileProgress = clamp(stardomeProgress / 0.56, 0, 1)
+  const domeReveal = clamp((stardomeProgress - 0.18) / 0.72, 0, 1)
+  const parabolaFade = clamp(1 - domeReveal * 1.2, 0, 1)
+  const stardomeTitleReveal = clamp((stardomeProgress - 0.56) / 0.34, 0, 1)
+
+  const projectileX = 8 + projectileProgress * 84
+  const projectileY = 82 - 66 * 4 * projectileProgress * (1 - projectileProgress)
 
   return (
     <main className="app-shell">
@@ -242,6 +275,67 @@ function App() {
           </h2>
 
           {!roverVideoReady && <p className="sequence-loading rover-loading">Loading sequence...</p>}
+        </div>
+      </section>
+
+      <section className="stardome-section" ref={stardomeSectionRef}>
+        <div className="stardome-sticky">
+          <div className="stardome-parabola-shell" style={{ opacity: parabolaFade }}>
+            <svg className="stardome-parabola" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                pathLength="1"
+                d="M 8 82 Q 50 12 92 82"
+                style={{ strokeDasharray: 1, strokeDashoffset: 1 - projectileProgress }}
+              />
+            </svg>
+
+            <div
+              className="stardome-projectile"
+              style={{
+                left: `${projectileX}%`,
+                top: `${projectileY}%`,
+                opacity: clamp(0.42 + projectileProgress, 0, 1),
+              }}
+              aria-hidden="true"
+            />
+          </div>
+
+          <div
+            className="stardome-dome"
+            style={{
+              opacity: domeReveal,
+              transform: `translateX(-50%) scale(${0.64 + domeReveal * 0.36})`,
+            }}
+            aria-hidden="true"
+          >
+            <div className="stardome-dome-grid" />
+            <div className="stardome-stars" style={{ transform: `translateY(${(1 - domeReveal) * 24}px)` }}>
+              {stardomeStars.map((star, index) => (
+                <span
+                  key={`${index}-${star.x.toFixed(2)}`}
+                  style={{
+                    left: `${star.x}%`,
+                    top: `${star.y}%`,
+                    width: `${star.size}px`,
+                    height: `${star.size}px`,
+                    '--twinkle-base': star.alpha,
+                    '--twinkle-delay': `${star.delay}s`,
+                    '--twinkle-duration': `${star.duration}s`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <h2
+            className="stardome-title"
+            style={{
+              opacity: stardomeTitleReveal,
+              transform: `translate(-50%, calc(-50% + ${(1 - stardomeTitleReveal) * 24}px))`,
+            }}
+          >
+            STARDOME
+          </h2>
         </div>
       </section>
     </main>
