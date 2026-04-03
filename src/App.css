@@ -83,101 +83,48 @@
   pointer-events: none;
 }
 
-.galaxy-parallax-section {
-  min-height: 260svh;
+.rover-section {
+  min-height: 280svh;
   position: relative;
   background: #030202;
 }
 
-.galaxy-parallax-sticky {
+.rover-sticky {
   position: sticky;
   top: 0;
   height: 100svh;
   overflow: hidden;
-  isolation: isolate;
   background: #030202;
 }
 
-.galaxy-layer {
-  position: absolute;
-  inset: -14%;
-  will-change: transform;
-}
-
-.galaxy-layer img {
+.rover-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  will-change: transform;
+  filter: saturate(0.82) contrast(1.05) brightness(0.76);
 }
 
-.galaxy-layer-far {
-  z-index: 1;
-}
-
-.galaxy-layer-far img {
-  opacity: 0.22;
-  filter: saturate(0.34) brightness(0.18) blur(2px);
-}
-
-.galaxy-layer-mid {
-  z-index: 2;
-}
-
-.galaxy-layer-mid img {
-  opacity: 0.35;
-  filter: saturate(0.46) brightness(0.3);
-}
-
-.galaxy-layer-near {
-  z-index: 3;
-  background:
-    radial-gradient(circle at 18% 28%, rgba(255, 255, 255, 0.24) 1px, transparent 2px),
-    radial-gradient(circle at 78% 18%, rgba(184, 223, 255, 0.25) 1.2px, transparent 2.3px),
-    radial-gradient(circle at 62% 78%, rgba(201, 214, 255, 0.22) 1px, transparent 2px),
-    radial-gradient(circle at 35% 64%, rgba(255, 255, 255, 0.2) 1.1px, transparent 2px);
-  background-size: 560px 560px, 640px 640px, 700px 700px, 520px 520px;
-  mix-blend-mode: screen;
-  opacity: 0.28;
-}
-
-.galaxy-vignette {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 55%, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.95)),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.96));
-}
-
-.galaxy-copy {
+.rover-title-text {
   position: absolute;
   inset: 50% auto auto 50%;
-  z-index: 5;
-  text-align: center;
+  z-index: 3;
+  margin: 0;
   pointer-events: none;
   transition: opacity 220ms linear, transform 260ms ease;
-}
-
-.galaxy-copy p {
-  margin: 0;
-  font-family: 'Bebas Neue', 'Segoe UI', sans-serif;
-  letter-spacing: 0.32em;
   text-transform: uppercase;
-  font-size: clamp(0.95rem, 1.1vw, 1.2rem);
-  color: rgba(196, 232, 255, 0.92);
-}
-
-.galaxy-copy h2 {
-  margin: 0.58rem 0 0;
+  letter-spacing: 0.16em;
+  font-size: clamp(2.5rem, 10vw, 8.4rem);
   font-family: 'Audiowide', 'Orbitron', sans-serif;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: clamp(2rem, 6.6vw, 5.5rem);
-  color: rgba(248, 252, 255, 0.95);
+  color: rgba(247, 251, 255, 0.97);
   text-shadow:
-    0 0 20px rgba(145, 190, 255, 0.3),
-    0 0 42px rgba(192, 226, 255, 0.24);
+    0 0 14px rgba(255, 255, 255, 0.28),
+    0 0 40px rgba(173, 206, 255, 0.3);
+}
+
+.rover-loading {
+  bottom: clamp(1.2rem, 3vw, 2.2rem);
 }
 
 @media (max-width: 900px) {
@@ -185,8 +132,8 @@
     min-height: 400svh;
   }
 
-  .galaxy-parallax-section {
-    min-height: 230svh;
+  .rover-section {
+    min-height: 250svh;
   }
 }
 
@@ -205,7 +152,7 @@
 @media (prefers-reduced-motion: reduce) {
   .club-intro-text,
   .astrocet-title-text,
-  .galaxy-copy {
+  .rover-title-text {
     transition: none;
   }
 }
