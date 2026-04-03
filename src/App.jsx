@@ -24,20 +24,13 @@ function getSectionProgress(sectionElement) {
   return clamp(-rect.top / travelDistance, 0, 1)
 }
 
-function getScrollPhases(sectionElement) {
+function getSectionScrubProgress(sectionElement) {
   if (!sectionElement) {
-    return { overall: 0, scrub: 0, reveal: 0 }
+    return 0
   }
 
   const overall = getSectionProgress(sectionElement)
-
-  const scrub = clamp(overall / scrubPortion, 0, 1)
-  const reveal =
-    overall <= scrubPortion
-      ? 0
-      : clamp((overall - scrubPortion) / (1 - scrubPortion), 0, 1)
-
-  return { overall, scrub, reveal }
+  return clamp(overall / scrubPortion, 0, 1)
 }
 
 function syncVideoFrame(video, duration, targetTime) {
@@ -79,7 +72,7 @@ function App() {
   useEffect(() => {
     function updateFromScrollPosition() {
       if (sequenceSectionRef.current) {
-        const { scrub } = getScrollPhases(sequenceSectionRef.current)
+        const scrub = getSectionScrubProgress(sequenceSectionRef.current)
         setHeroScrubProgress(scrub)
 
         if (heroDurationRef.current > 0) {
@@ -88,7 +81,7 @@ function App() {
       }
 
       if (roverSectionRef.current) {
-        const { scrub } = getScrollPhases(roverSectionRef.current)
+        const scrub = getSectionScrubProgress(roverSectionRef.current)
         setRoverScrubProgress(scrub)
 
         if (roverDurationRef.current > 0) {
@@ -123,7 +116,7 @@ function App() {
       setHeroVideoReady(heroDurationRef.current > 0)
 
       if (sequenceSectionRef.current && heroDurationRef.current > 0) {
-        const { scrub } = getScrollPhases(sequenceSectionRef.current)
+        const scrub = getSectionScrubProgress(sequenceSectionRef.current)
         setHeroScrubProgress(scrub)
         heroTargetTimeRef.current = scrub * heroDurationRef.current
       }
@@ -134,7 +127,7 @@ function App() {
       setRoverVideoReady(roverDurationRef.current > 0)
 
       if (roverSectionRef.current && roverDurationRef.current > 0) {
-        const { scrub } = getScrollPhases(roverSectionRef.current)
+        const scrub = getSectionScrubProgress(roverSectionRef.current)
         setRoverScrubProgress(scrub)
         roverTargetTimeRef.current = scrub * roverDurationRef.current
       }
