@@ -304,7 +304,6 @@ function App() {
   const sceneProgress = clamp(scrollProgress * 1.15, 0, 1)
   const heroTransition = clamp(sceneProgress / 0.42, 0, 1)
   const aboutInFront = sceneProgress > 0.62
-  const showNavItems = sceneProgress > 0.16
   const heroOpacity = clamp(1 - heroTransition, 0, 1)
   const heroShift = heroTransition * 108
   const heroBlur = heroTransition * 16
@@ -316,6 +315,8 @@ function App() {
     0,
     1,
   )
+
+  const showNavItems = sceneProgress > 0.16 && centerMoveProgress < 0.1
 
   const endTitleOpacity = clamp((centerMoveProgress - 0.2) / 0.5, 0, 1)
   const endTitleShift = (1 - centerMoveProgress) * 140 - 75 // Rises 75px higher than the hero text did to show 3/4 above Mars
