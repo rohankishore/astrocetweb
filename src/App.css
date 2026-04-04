@@ -268,6 +268,7 @@ main {
 
 .about-stage--front {
   z-index: 4;
+  
   opacity: 1;
   pointer-events: auto;
 }
