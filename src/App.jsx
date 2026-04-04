@@ -354,8 +354,8 @@ function App() {
         </Suspense>
       </div>
 
-      <h1
-        className="hero-behind-title"
+      <div
+        className="hero-behind-title-wrap"
         aria-hidden="true"
         style={{
           opacity: finalTitleOpacity,
@@ -363,8 +363,11 @@ function App() {
           transform: `translate3d(-50%, calc(-50% + ${finalTitleShift}px), 0) scale(${finalTitleScale})`,
         }}
       >
-        ASTROCET
-      </h1>
+        <h1 className="hero-behind-title">ASTROCET</h1>
+        <p className="site-credit-fixed" style={{ opacity: endTitleOpacity }}>
+          Made by Rohan Kishore. Minimal AI slop used.
+        </p>
+      </div>
 
       <div className="star-dots-wrap" ref={starDotsRef} aria-hidden="true">
         <div className="star-dots"></div>
@@ -471,8 +474,6 @@ function App() {
               );
             })}
           </div>
-
-          <p className="site-credit reveal is-visible">Made by AstroCET. All rights reserved.</p>
         </div>
       </section>
     </div>
