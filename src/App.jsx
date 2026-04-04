@@ -342,9 +342,10 @@ function App() {
 
   const leftFadeIn = clamp((rightMoveProgress - 0.28) / 0.56, 0, 1)
   const leftFadeOut = clamp((leftMoveProgress - 0.16) / 0.46, 0, 1)
-  const leftStoryFade = clamp(leftFadeIn * (1 - leftFadeOut), 0, 1)
+  const masterFadeOut = clamp((centerMoveProgress - 0.1) / 0.3, 0, 1) // Fades everything out at the end
+  const leftStoryFade = clamp(leftFadeIn * (1 - leftFadeOut), 0, 1) * (1 - masterFadeOut)
 
-  const rightStoryFade = clamp((leftMoveProgress - 0.24) / 0.58, 0, 1)
+  const rightStoryFade = clamp((leftMoveProgress - 0.24) / 0.58, 0, 1) * (1 - masterFadeOut)
 
   const leftStoryStyle = {
     opacity: leftStoryFade,
@@ -458,7 +459,7 @@ function App() {
 
             {clubHighlights.map((item, index) => {
               const startFade = 0.78 + index * 0.06;
-              const itemFade = clamp((sceneProgress - startFade) / 0.1, 0, 1);
+              const itemFade = clamp((sceneProgress - startFade) / 0.1, 0, 1) * (1 - masterFadeOut);
               
               const itemStyle = {
                 opacity: itemFade,
