@@ -248,6 +248,19 @@ function App() {
     }
   }, [])
 
+  const starDotsRef = useRef(null)
+
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (!starDotsRef.current) return
+      const x = (e.clientX / window.innerWidth - 0.5) * 36
+      const y = (e.clientY / window.innerHeight - 0.5) * 36
+      starDotsRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`
+    }
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
+    return () => window.removeEventListener('mousemove', onMouseMove)
+  }, [])
+
   const sceneProgress = clamp(scrollProgress * 1.45, 0, 1)
   const heroTransition = clamp(sceneProgress / 0.42, 0, 1)
   const aboutInFront = sceneProgress > 0.62
@@ -308,7 +321,9 @@ function App() {
         ASTROCET
       </h1>
 
-      <div className="star-dots" aria-hidden="true"></div>
+      <div className="star-dots-wrap" ref={starDotsRef} aria-hidden="true">
+        <div className="star-dots"></div>
+      </div>
 
       <header className="top-nav">
         <a href="#" className={`brand ${showNavItems ? '' : 'brand--hidden'}`}>
@@ -336,7 +351,6 @@ function App() {
               filter: `blur(${heroBlur * 0.65}px)`,
             }}
           >
-            <button className="hero-cta">Explore</button>
           </div>
           <div className="scroll-indicator" aria-hidden="true">
             <span></span>

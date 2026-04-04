@@ -39,10 +39,17 @@
   background: transparent;
 }
 
-.star-dots {
+.star-dots-wrap {
   position: fixed;
-  inset: 0;
+  inset: -60px;
   z-index: 1;
+  pointer-events: none;
+  transition: transform 140ms ease-out;
+}
+
+.star-dots {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
   background-image:
     radial-gradient(circle at 24% 20%, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.7px),
