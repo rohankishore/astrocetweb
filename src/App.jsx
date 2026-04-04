@@ -264,17 +264,29 @@ function App() {
   const heroBlur = heroTransition * 16
   const heroScale = 1 + heroTransition * 0.08
 
-  // Fade each story panel slightly before the corresponding Mars movement settles.
-  const leftStoryFade = clamp(
-    (sceneProgress - (marsPhases.rightMoveEnd - 0.1)) / 0.12,
+  // Story panels are driven by Mars movement phases for cleaner visual sync.
+  const rightMoveProgress = clamp(
+    (sceneProgress - marsPhases.rightMoveStart) /
+      (marsPhases.rightMoveEnd - marsPhases.rightMoveStart),
     0,
     1,
   )
-  const rightStoryFade = clamp(
-    (sceneProgress - (marsPhases.leftMoveStart + 0.06)) / 0.12,
+  const leftMoveProgress = clamp(
+    (sceneProgress - marsPhases.leftMoveStart) /
+      (1 - marsPhases.leftMoveStart),
     0,
     1,
   )
+
+  // Left content fades in while Mars is moving right, then fades out as Mars moves left.
+  const leftFadeIn = clamp((rightMoveProgress - 0.28) / 0.56, 0, 1)
+  const leftFadeOut = clamp((leftMoveProgress - 0.16) / 0.46, 0, 1)
+  const leftStoryFade = clamp(leftFadeIn * (1 - leftFadeOut), 0, 1)
+
+  // Right content fades in while Mars is moving left, before it fully settles.
+  const rightStoryFade = clamp((leftMoveProgress - 0.24) / 0.58, 0, 1)
+
+  const clubGridFade = clamp((sceneProgress - 0.9) / 0.08, 0, 1)
 
   const leftStoryStyle = {
     opacity: leftStoryFade,
@@ -286,6 +298,13 @@ function App() {
     opacity: rightStoryFade,
     transform: `translate3d(${(1 - rightStoryFade) * 34}px, ${(1 - rightStoryFade) * 18}px, 0)`,
     filter: `blur(${(1 - rightStoryFade) * 7}px)`,
+  }
+
+  const clubGridStyle = {
+    opacity: clubGridFade,
+    transform: `translate3d(0, ${(1 - clubGridFade) * 26}px, 0)`,
+    filter: `blur(${(1 - clubGridFade) * 6}px)`,
+    pointerEvents: clubGridFade > 0.96 ? 'auto' : 'none',
   }
 
   return (
@@ -381,7 +400,7 @@ function App() {
             </div>
           </div>
 
-          <div className="club-grid">
+          <div className="club-grid" style={clubGridStyle}>
             <article
               id="events"
               data-reveal-id="events"
