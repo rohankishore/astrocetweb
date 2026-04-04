@@ -221,6 +221,25 @@ function App() {
   const rafRef = useRef(0)
 
   useEffect(() => {
+    const lenis = new Lenis({
+      lerp: 0.08,
+      wheelMultiplier: 0.8,
+    })
+
+    let rafId
+    function raf(time) {
+      lenis.raf(time)
+      rafId = requestAnimationFrame(raf)
+    }
+    rafId = requestAnimationFrame(raf)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      lenis.destroy()
+    }
+  }, [])
+
+  useEffect(() => {
     const getProgress = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
       return maxScroll > 0 ? window.scrollY / maxScroll : 0
