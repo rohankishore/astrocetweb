@@ -16,39 +16,11 @@ const navItems = [
   { label: 'Contact us', href: '#contact' },
 ]
 
-const aboutMetrics = [
-  {
-    value: '2019',
-    label: 'Founded as a student hobby club',
-  },
-  {
-    value: 'CET',
-    label: 'College of Engineering Trivandrum',
-  },
-  {
-    value: 'Astronomy',
-    label: 'Focused learning and sky exploration',
-  },
-  {
-    value: 'Outreach',
-    label: 'Activities for students and the public',
-  },
-]
-
-const aboutPanels = [
-  {
-    id: 'vision',
-    title: 'Vision',
-    body:
-      'AstroCET aims to lead astronomy education and outreach by inspiring students and the public to explore the cosmos through skill development, collaboration, and innovation.',
-  },
-  {
-    id: 'mission',
-    title: 'Mission',
-    body:
-      "The club's primary mission is to ignite passion for astronomy by providing a platform for learning, exploration, and innovation.",
-  },
-]
+const marsPhases = {
+  rightMoveStart: 0.42,
+  rightMoveEnd: 0.62,
+  leftMoveStart: 0.74,
+}
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value))
@@ -123,11 +95,12 @@ function MarsModel({ progress }) {
     const xStart = isMobile ? 0 : -0.05
     const yStart = isMobile ? -3.85 : -5.35
 
-    const rightPhaseStart = 0.42
-    const rightPhaseEnd = 0.72
+    const rightPhaseStart = marsPhases.rightMoveStart
+    const rightPhaseEnd = marsPhases.rightMoveEnd
+    const holdPhaseEnd = marsPhases.leftMoveStart
     const toHeroEnd = clamp(t / rightPhaseStart, 0, 1)
     const toRight = clamp((t - rightPhaseStart) / (rightPhaseEnd - rightPhaseStart), 0, 1)
-    const toLeft = clamp((t - rightPhaseEnd) / (1 - rightPhaseEnd), 0, 1)
+    const toLeft = clamp((t - holdPhaseEnd) / (1 - holdPhaseEnd), 0, 1)
 
     const xAtHeroEnd = isMobile ? 0.16 : 0.56
     const xRight = isMobile ? 1.02 : 3.02
@@ -158,6 +131,12 @@ function MarsModel({ progress }) {
       scale = THREE.MathUtils.lerp(scaleAtHeroEnd, scaleAtRight, toRight)
       rotationX = THREE.MathUtils.lerp(0.06, 0.02, toRight)
       rotationZ = THREE.MathUtils.lerp(0, 0.08, toRight)
+    } else if (t <= holdPhaseEnd) {
+      x = xRight
+      y = yRight
+      scale = scaleAtRight
+      rotationX = 0.02
+      rotationZ = 0.08
     } else {
       x = THREE.MathUtils.lerp(xRight, xLeft, toLeft)
       y = THREE.MathUtils.lerp(yRight, yLeft, toLeft)
@@ -284,7 +263,30 @@ function App() {
   const heroShift = heroTransition * 108
   const heroBlur = heroTransition * 16
   const heroScale = 1 + heroTransition * 0.08
-  const contentOnRight = sceneProgress > 0.72
+
+  // Fade each story panel slightly before the corresponding Mars movement settles.
+  const leftStoryFade = clamp(
+    (sceneProgress - (marsPhases.rightMoveEnd - 0.1)) / 0.12,
+    0,
+    1,
+  )
+  const rightStoryFade = clamp(
+    (sceneProgress - (marsPhases.leftMoveStart + 0.06)) / 0.12,
+    0,
+    1,
+  )
+
+  const leftStoryStyle = {
+    opacity: leftStoryFade,
+    transform: `translate3d(${(1 - leftStoryFade) * -34}px, ${(1 - leftStoryFade) * 18}px, 0)`,
+    filter: `blur(${(1 - leftStoryFade) * 7}px)`,
+  }
+
+  const rightStoryStyle = {
+    opacity: rightStoryFade,
+    transform: `translate3d(${(1 - rightStoryFade) * 34}px, ${(1 - rightStoryFade) * 18}px, 0)`,
+    filter: `blur(${(1 - rightStoryFade) * 7}px)`,
+  }
 
   return (
     <div className="app-shell">
@@ -343,72 +345,39 @@ function App() {
       </main>
 
       <section
-        className={`about-stage ${aboutInFront ? 'about-stage--front' : 'about-stage--behind'} ${contentOnRight ? 'about-stage--content-right' : 'about-stage--content-left'}`}
+        className={`about-stage ${aboutInFront ? 'about-stage--front' : 'about-stage--behind'}`}
         id="about"
       >
         <div className="about-wrap">
-          <article
-            data-reveal-id="about-intro"
-            className={`about-intro reveal ${visibleSections['about-intro'] ? 'is-visible' : ''}`}
-          >
-            <p className="about-kicker">astroCET</p>
-            <h2>
-              College of Engineering Trivandrum astronomy club.
-            </h2>
-            <p>
-              AstroCET is the astronomy club of CET Trivandrum. Started in 2019
-              as a hobby club, it has grown into an active student community for
-              celestial observation, technical learning, and public outreach.
-            </p>
-          </article>
-
-          <div className="about-metrics">
-            {aboutMetrics.map((metric, index) => (
+          <div className="story-flow">
+            <div className="story-row story-row--left">
               <article
-                key={metric.label}
-                data-reveal-id={`metric-${index}`}
-                className={`metric-item reveal ${visibleSections[`metric-${index}`] ? 'is-visible' : ''}`}
-                style={{ '--delay': `${index * 90}ms` }}
+                className="story-panel phase-panel"
+                style={leftStoryStyle}
               >
-                <p className="metric-value">{metric.value}</p>
-                <p className="metric-label">{metric.label}</p>
+                <p className="about-kicker">astroCET</p>
+                <h2>CET Trivandrum's astronomy club for curious minds.</h2>
+                <p>
+                  Founded in 2019 as a student hobby club, AstroCET has grown
+                  into a vibrant space for celestial observation, technical
+                  learning, and community-driven exploration of the cosmos.
+                </p>
               </article>
-            ))}
-          </div>
+            </div>
 
-          <div className="about-grid">
-            <article
-              data-reveal-id="about-core"
-              className={`about-block about-block--lead reveal ${visibleSections['about-core'] ? 'is-visible' : ''}`}
-              style={{ '--delay': '140ms' }}
-            >
-              <p className="about-kicker">Astro Story</p>
-              <h3>A student-led club focused on astronomy.</h3>
-              <p>
-                From observation sessions to technical activities, AstroCET
-                creates an inclusive space where students collaborate, build
-                practical skills, and explore the universe together.
-              </p>
-              <div className="about-tags" aria-label="Club highlights">
-                <span>Past Events</span>
-                <span>Announcements</span>
-                <span>Gallery</span>
-                <span>Contact Us</span>
-              </div>
-            </article>
-
-            <div className="about-column">
-              {aboutPanels.map((panel, index) => (
-                <article
-                  key={panel.id}
-                  data-reveal-id={`panel-${panel.id}`}
-                  className={`about-block reveal ${visibleSections[`panel-${panel.id}`] ? 'is-visible' : ''}`}
-                  style={{ '--delay': `${220 + index * 90}ms` }}
-                >
-                  <h3>{panel.title}</h3>
-                  <p>{panel.body}</p>
-                </article>
-              ))}
+            <div className="story-row story-row--right">
+              <article
+                className="story-panel phase-panel"
+                style={rightStoryStyle}
+              >
+                <p className="about-kicker">Our Focus</p>
+                <h2>Observation nights, learning sessions, and outreach.</h2>
+                <p>
+                  The club runs past events, announcements, and beginner-friendly
+                  astronomy activities that help students and the public build
+                  practical skills while staying connected to space science.
+                </p>
+              </article>
             </div>
           </div>
 
@@ -470,7 +439,7 @@ function App() {
             </article>
           </div>
 
-          <p className="site-credit reveal is-visible">Made by AstroCET. All rights reserved.</p>
+          <p className="site-credit reveal is-visible">Made by Rohan Kishore. Made with minimal ai slop</p>
         </div>
       </section>
     </div>

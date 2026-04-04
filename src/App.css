@@ -280,7 +280,53 @@ main {
   display: flex;
   flex-direction: column;
   gap: clamp(1.25rem, 2.7vw, 2.2rem);
-  transition: padding 520ms ease;
+}
+
+.story-flow {
+  width: min(1100px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 8vh, 6rem);
+}
+
+.story-row {
+  display: flex;
+  width: 100%;
+}
+
+.story-row--left {
+  justify-content: flex-start;
+}
+
+.story-row--right {
+  justify-content: flex-end;
+}
+
+.story-panel {
+  width: min(560px, 100%);
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(132, 174, 238, 0.34);
+  background: rgba(6, 15, 32, 0.52);
+}
+
+.story-panel h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.35vw, 2.35rem);
+  letter-spacing: 0.03em;
+  line-height: 1.08;
+  text-transform: uppercase;
+  color: var(--red-heading);
+  text-wrap: balance;
+}
+
+.story-panel p {
+  margin: 0.95rem 0 0;
+  font-size: clamp(0.96rem, 1.2vw, 1.1rem);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: rgba(196, 210, 236, 0.88);
 }
 
 .about-intro {
@@ -441,23 +487,6 @@ main {
   color: rgba(189, 206, 233, 0.78);
 }
 
-.about-intro,
-.about-metrics,
-.about-grid,
-.club-grid,
-.site-credit {
-  transition: margin 520ms ease;
-}
-
-.about-stage--content-right .about-intro,
-.about-stage--content-right .about-metrics,
-.about-stage--content-right .about-grid,
-.about-stage--content-right .club-grid,
-.about-stage--content-right .site-credit {
-  margin-left: auto;
-  margin-right: 0;
-}
-
 .about-column {
   display: flex;
   flex-direction: column;
@@ -533,13 +562,16 @@ main {
 
 @media (min-width: 960px) {
   .about-wrap {
-    padding-right: min(46vw, 620px);
     padding-left: clamp(1rem, 5vw, 4.8rem);
+    padding-right: clamp(1rem, 5vw, 4.8rem);
   }
 
-  .about-stage--content-right .about-wrap {
+  .story-row--left {
+    padding-right: min(46vw, 620px);
+  }
+
+  .story-row--right {
     padding-left: min(46vw, 620px);
-    padding-right: clamp(1rem, 5vw, 4.8rem);
   }
 }
 
@@ -589,6 +621,8 @@ main {
   .about-intro,
   .about-metrics,
   .about-grid,
+  .story-flow,
+  .story-panel,
   .club-grid,
   .site-credit {
     width: 100%;
