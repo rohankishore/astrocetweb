@@ -1,329 +1,377 @@
-/* man its so hard not to act rekless */
+/* man its so hard not to act reckless baammm baaamm bam bam */
+/* why am i so peak? */
 
 
-import { useEffect, useRef, useState } from 'react'
-import heroVideoUrl from './assets/ROVER_scroll.mp4?url'
-import roverVideoUrl from './assets/Mars_rover_moving_202604030727_scroll.mp4?url'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Stars, useGLTF } from '@react-three/drei'
+import * as THREE from 'three'
 import './App.css'
 
-const scrubPortion = 0.72
+const navItems = ['Home', 'About', 'Mission', 'News', 'Contact']
+
+const aboutMetrics = [
+  {
+    value: '280+',
+    label: 'Production deployments completed',
+  },
+  {
+    value: '42',
+    label: 'Engineers across hardware and software',
+  },
+  {
+    value: '99.2%',
+    label: 'Average uptime for live industrial systems',
+  },
+  {
+    value: '24/7',
+    label: 'Support and remote diagnostics coverage',
+  },
+]
+
+const aboutPanels = [
+  {
+    id: 'precision',
+    title: 'Precision Engineering',
+    body:
+      'We design resilient electronics and controls with rigorous validation so products stay stable in high-noise, high-load environments.',
+  },
+  {
+    id: 'intelligence',
+    title: 'Intelligent Software',
+    body:
+      'Telemetry pipelines, predictive analytics, and real-time observability are built in from day one to keep systems measurable and adaptable.',
+  },
+]
 
 function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max)
+  return Math.max(min, Math.min(max, value))
 }
 
-function getSectionProgress(sectionElement) {
-  if (!sectionElement) {
-    return 0
-  }
+function MarsModel({ progress }) {
+  const groupRef = useRef(null)
+  const smoothedProgress = useRef(0)
+  const { viewport, gl } = useThree()
+  const { scene } = useGLTF('/models/mars.glb')
 
-  const rect = sectionElement.getBoundingClientRect()
-  const travelDistance = rect.height - window.innerHeight
+  const meshAsset = useMemo(() => {
+    let firstMesh = null
+    scene.traverse((node) => {
+      if (!firstMesh && node.isMesh) {
+        firstMesh = node
+      }
+    })
 
-  if (travelDistance <= 0) {
-    return rect.top < 0 ? 1 : 0
-  }
-
-  return clamp(-rect.top / travelDistance, 0, 1)
-}
-
-function getSectionScrubProgress(sectionElement) {
-  if (!sectionElement) {
-    return 0
-  }
-
-  const overall = getSectionProgress(sectionElement)
-  return clamp(overall / scrubPortion, 0, 1)
-}
-
-function syncVideoFrame(video, duration, targetTime) {
-  if (!video || duration <= 0) {
-    return
-  }
-
-  /* sadhanam kayyilundoooo???? */
-
-
-  const safeDuration = Math.max(duration - 0.001, 0)
-  const target = clamp(targetTime, 0, safeDuration)
-  const delta = target - video.currentTime
-
-  if (Math.abs(delta) > 0.008) {
-    const step = Math.abs(delta) < 0.045 ? delta : delta * 0.22
-    const nextTime = clamp(video.currentTime + step, 0, safeDuration)
-
-    try {
-      video.currentTime = nextTime
-    } catch {
-      // Ignore seek exceptions while the browser is still buffering.
+    if (!firstMesh) {
+      return null
     }
-  }
+
+    const geometry = firstMesh.geometry.clone()
+    geometry.computeBoundingBox()
+    const center = geometry.boundingBox?.getCenter(new THREE.Vector3())
+    if (center) {
+      geometry.translate(-center.x, -center.y, -center.z)
+    }
+
+    geometry.computeBoundingSphere()
+    const radius = geometry.boundingSphere?.radius || 1
+
+    const sourceMaterial = Array.isArray(firstMesh.material)
+      ? firstMesh.material[0]
+      : firstMesh.material
+    const material = sourceMaterial?.clone
+      ? sourceMaterial.clone()
+      : new THREE.MeshStandardMaterial({ color: '#a96245' })
+
+    if (material.map) {
+      material.map.anisotropy = gl.capabilities.getMaxAnisotropy()
+      material.map.needsUpdate = true
+    }
+
+    material.roughness = 0.9
+    material.metalness = 0.03
+    material.emissive = new THREE.Color('#2b150f')
+    material.emissiveIntensity = 0.28
+    material.needsUpdate = true
+
+    return { geometry, material, radius }
+  }, [scene, gl])
+
+  useFrame((_, delta) => {
+    if (!groupRef.current || !meshAsset) return
+
+    smoothedProgress.current = THREE.MathUtils.damp(
+      smoothedProgress.current,
+      progress,
+      5,
+      delta,
+    )
+
+    const t = smoothedProgress.current
+    const isMobile = viewport.width < 8
+
+    const targetStartRadius = isMobile ? 4.15 : 5.8
+    const targetEndRadius = isMobile ? 1.9 : 2.45
+    const startScale = targetStartRadius / meshAsset.radius
+    const endScale = targetEndRadius / meshAsset.radius
+    const xStart = isMobile ? 0 : -0.05
+    const xEnd = isMobile ? 0.86 : 2.72
+    const yStart = isMobile ? -3.85 : -5.35
+    const yEnd = isMobile ? -0.38 : -0.16
+
+    const scale = THREE.MathUtils.lerp(startScale, endScale, t)
+    const x = THREE.MathUtils.lerp(xStart, xEnd, t)
+    const y = THREE.MathUtils.lerp(yStart, yEnd, t)
+
+    groupRef.current.scale.setScalar(scale)
+    groupRef.current.position.set(x, y, -0.25)
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(0.2, 0.04, t)
+    groupRef.current.rotation.z = THREE.MathUtils.lerp(-0.06, 0.02, t)
+    groupRef.current.rotation.y += delta * 0.12
+  })
+
+  return (
+    <group ref={groupRef}>
+      {meshAsset ? (
+        <mesh
+          geometry={meshAsset.geometry}
+          material={meshAsset.material}
+          frustumCulled={false}
+        />
+      ) : null}
+    </group>
+  )
+}
+
+function SpaceScene({ progress }) {
+  return (
+    <Canvas
+      className="scene-canvas"
+      camera={{ position: [0, 0.2, 7.8], fov: 40 }}
+      dpr={[1, 2]}
+      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+      onCreated={({ gl }) => {
+        gl.setClearColor('#ddd0c2', 0)
+      }}
+    >
+      <ambientLight intensity={0.9} />
+      <hemisphereLight intensity={0.46} color="#fff8f3" groundColor="#b86a54" />
+      <directionalLight position={[5.5, 4.5, 5.2]} intensity={1.34} color="#ffd3c0" />
+      <directionalLight position={[-6, -2, -5]} intensity={0.33} color="#9faec9" />
+
+      <Stars
+        radius={180}
+        depth={90}
+        count={1900}
+        factor={3.4}
+        saturation={0}
+        fade
+        speed={0.25}
+      />
+
+      <MarsModel progress={progress} />
+    </Canvas>
+  )
 }
 
 function App() {
-  const sequenceSectionRef = useRef(null)
-  const roverSectionRef = useRef(null)
-  const stardomeSectionRef = useRef(null)
-
-  const heroVideoRef = useRef(null)
-  const roverVideoRef = useRef(null)
-  const heroDurationRef = useRef(0)
-  const roverDurationRef = useRef(0)
-  const heroTargetTimeRef = useRef(0)
-  const roverTargetTimeRef = useRef(0)
-  const animationFrameRef = useRef(0)
-
-  const [heroVideoReady, setHeroVideoReady] = useState(false)
-  const [roverVideoReady, setRoverVideoReady] = useState(false)
-  const [heroScrubProgress, setHeroScrubProgress] = useState(0)
-  const [roverScrubProgress, setRoverScrubProgress] = useState(0)
-  const [stardomeProgress, setStardomeProgress] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [visibleSections, setVisibleSections] = useState({})
+  const rafRef = useRef(0)
 
   useEffect(() => {
-    function updateFromScrollPosition() {
-      if (sequenceSectionRef.current) {
-        const scrub = getSectionScrubProgress(sequenceSectionRef.current)
-        setHeroScrubProgress(scrub)
-
-        if (heroDurationRef.current > 0) {
-          heroTargetTimeRef.current = scrub * heroDurationRef.current
-        }
-      }
-
-      if (roverSectionRef.current) {
-        const scrub = getSectionScrubProgress(roverSectionRef.current)
-        setRoverScrubProgress(scrub)
-
-        if (roverDurationRef.current > 0) {
-          roverTargetTimeRef.current = scrub * roverDurationRef.current
-        }
-      }
-
-      if (stardomeSectionRef.current) {
-        setStardomeProgress(getSectionProgress(stardomeSectionRef.current))
-      }
+    const getProgress = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+      return maxScroll > 0 ? window.scrollY / maxScroll : 0
     }
 
-    updateFromScrollPosition()
-    window.addEventListener('scroll', updateFromScrollPosition, { passive: true })
-    window.addEventListener('resize', updateFromScrollPosition)
+    const syncProgress = () => {
+      setScrollProgress(clamp(getProgress(), 0, 1))
+      rafRef.current = 0
+    }
+
+    const onScroll = () => {
+      if (rafRef.current) return
+      rafRef.current = window.requestAnimationFrame(syncProgress)
+    }
+
+    syncProgress()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
 
     return () => {
-      window.removeEventListener('scroll', updateFromScrollPosition)
-      window.removeEventListener('resize', updateFromScrollPosition)
-    }
-  }, [])
-
-  useEffect(() => {
-    const heroVideo = heroVideoRef.current
-    const roverVideo = roverVideoRef.current
-
-    function prepareVideo(video) {
-      video.pause()
-      video.muted = true
-      video.playsInline = true
-      video.preload = 'auto'
-    }
-
-    function handleHeroReady() {
-      heroDurationRef.current = heroVideo?.duration || 0
-      setHeroVideoReady(heroDurationRef.current > 0)
-
-      if (sequenceSectionRef.current && heroDurationRef.current > 0) {
-        const scrub = getSectionScrubProgress(sequenceSectionRef.current)
-        setHeroScrubProgress(scrub)
-        heroTargetTimeRef.current = scrub * heroDurationRef.current
-      }
-    }
-
-    function handleRoverReady() {
-      roverDurationRef.current = roverVideo?.duration || 0
-      setRoverVideoReady(roverDurationRef.current > 0)
-
-      if (roverSectionRef.current && roverDurationRef.current > 0) {
-        const scrub = getSectionScrubProgress(roverSectionRef.current)
-        setRoverScrubProgress(scrub)
-        roverTargetTimeRef.current = scrub * roverDurationRef.current
-      }
-    }
-
-    if (heroVideo) {
-      prepareVideo(heroVideo)
-      heroVideo.addEventListener('loadedmetadata', handleHeroReady)
-      heroVideo.addEventListener('canplay', handleHeroReady)
-    }
-
-    if (roverVideo) {
-      prepareVideo(roverVideo)
-      roverVideo.addEventListener('loadedmetadata', handleRoverReady)
-      roverVideo.addEventListener('canplay', handleRoverReady)
-    }
-
-    return () => {
-      if (heroVideo) {
-        heroVideo.removeEventListener('loadedmetadata', handleHeroReady)
-        heroVideo.removeEventListener('canplay', handleHeroReady)
-      }
-
-      if (roverVideo) {
-        roverVideo.removeEventListener('loadedmetadata', handleRoverReady)
-        roverVideo.removeEventListener('canplay', handleRoverReady)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (rafRef.current) {
+        window.cancelAnimationFrame(rafRef.current)
       }
     }
   }, [])
 
   useEffect(() => {
-    function syncVideosToScroll() {
-      syncVideoFrame(heroVideoRef.current, heroDurationRef.current, heroTargetTimeRef.current)
-      syncVideoFrame(roverVideoRef.current, roverDurationRef.current, roverTargetTimeRef.current)
+    const nodes = Array.from(document.querySelectorAll('[data-reveal-id]'))
+    if (!nodes.length) return undefined
 
-      animationFrameRef.current = window.requestAnimationFrame(syncVideosToScroll)
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          const id = entry.target.getAttribute('data-reveal-id')
+          if (!id) return
+          setVisibleSections((prev) => (prev[id] ? prev : { ...prev, [id]: true }))
+          observer.unobserve(entry.target)
+        })
+      },
+      { threshold: 0.35 },
+    )
 
-    animationFrameRef.current = window.requestAnimationFrame(syncVideosToScroll)
-
-    return () => {
-      window.cancelAnimationFrame(animationFrameRef.current)
-    }
+    nodes.forEach((node) => observer.observe(node))
+    return () => observer.disconnect()
   }, [])
 
-  const introTaglineReveal = clamp(1 - heroScrubProgress / 0.36, 0, 1)
-  const astrocetReveal = clamp((heroScrubProgress - 0.22) / 0.36, 0, 1)
-  const roverTextReveal = clamp((roverScrubProgress - 0.28) / 0.46, 0, 1)
-
-  const projectileProgress = clamp(stardomeProgress / 0.56, 0, 1)
-  const circlePathReveal = clamp((stardomeProgress - 0.54) / 0.36, 0, 1)
-  const parabolaFade = clamp(1 - circlePathReveal * 1.25, 0, 1)
-  const stardomeTitleReveal = clamp((stardomeProgress - 0.62) / 0.28, 0, 1)
-  const stardomePathParallax = (0.5 - stardomeProgress) * 120
-
-  const projectileX = 8 + projectileProgress * 84
-  const projectileY = 82 - 66 * 4 * projectileProgress * (1 - projectileProgress)
+  const sceneProgress = clamp(scrollProgress * 1.45, 0, 1)
+  const heroTransition = clamp(sceneProgress / 0.42, 0, 1)
+  const aboutInFront = sceneProgress > 0.62
+  const showNavItems = sceneProgress > 0.16
+  const heroOpacity = clamp(1 - heroTransition, 0, 1)
+  const heroShift = heroTransition * 108
+  const heroBlur = heroTransition * 16
+  const heroScale = 1 + heroTransition * 0.08
 
   return (
-    <main className="app-shell">
-      <section className="sequence-section" ref={sequenceSectionRef}>
-        <div className="sequence-sticky">
-          <video
-            ref={heroVideoRef}
-            className="sequence-video"
-            src={heroVideoUrl}
-            muted
-            playsInline
-            preload="auto"
-            aria-label="Scroll synced club hero sequence"
-          />
+    <div className="app-shell">
+      <div className="space-backdrop" aria-hidden="true">
+        <Suspense fallback={null}>
+          <SpaceScene progress={sceneProgress} />
+        </Suspense>
+      </div>
 
-          <div className="sequence-shade" aria-hidden="true" />
-          <p
-            className="club-intro-text"
-            style={{
-              opacity: introTaglineReveal,
-              transform: `translate(-50%, calc(-50% + ${heroScrubProgress * 34}px))`,
-            }}
-          >
-            CET'S OWN ASTRONOMY CLUB
-          </p>
+      <h1
+        className="hero-behind-title"
+        aria-hidden="true"
+        style={{
+          opacity: heroOpacity,
+          filter: `blur(${heroBlur}px)`,
+          transform: `translate3d(-50%, -50%, 0) scale(${heroScale})`,
+        }}
+      >
+        ARYA ELECTRONICS
+      </h1>
 
-          <h1
-            className="astrocet-title-text"
-            style={{
-              opacity: astrocetReveal,
-              transform: `translate(-50%, calc(-50% + ${(1 - astrocetReveal) * 24}px)) scale(${0.9 + astrocetReveal * 0.1})`,
-            }}
-          >
-            ASTROCET
-          </h1>
+      <div className="star-dots" aria-hidden="true"></div>
 
-          {!heroVideoReady && <p className="sequence-loading">Loading sequence...</p>}
-        </div>
-      </section>
+      <header className={`top-nav ${sceneProgress > 0.08 ? 'top-nav--solid' : ''}`}>
+        <a href="#" className={`brand ${showNavItems ? '' : 'brand--hidden'}`}>
+          Arya Electronics
+        </a>
+        <nav
+          className={`menu ${showNavItems ? '' : 'menu--hidden'}`}
+          aria-label="Primary"
+        >
+          {navItems.map((item) => (
+            <a key={item} href="#">
+              {item}
+            </a>
+          ))}
+        </nav>
+      </header>
 
-      <section className="stardome-section" ref={stardomeSectionRef}>
-        <div className="stardome-sticky">
-          <div className="stardome-starfield" aria-hidden="true" />
-
-          <div className="stardome-parabola-shell" style={{ opacity: parabolaFade }}>
-            <svg className="stardome-parabola" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              <path
-                pathLength="1"
-                d="M 8 82 Q 50 12 92 82"
-                style={{ strokeDasharray: 1, strokeDashoffset: 1 - projectileProgress }}
-              />
-            </svg>
-
-            <div
-              className="stardome-projectile"
-              style={{
-                left: `${projectileX}%`,
-                top: `${projectileY}%`,
-                opacity: clamp(0.42 + projectileProgress, 0, 1),
-              }}
-              aria-hidden="true"
-            />
-          </div>
-
+      <main>
+        <section className="hero-stage">
           <div
-            className="stardome-circle-shell"
+            className="hero-copy"
             style={{
-              opacity: circlePathReveal,
-              transform: `translateX(-50%) translateY(${stardomePathParallax}px) scale(${0.82 + circlePathReveal * 0.18})`,
+              opacity: heroOpacity,
+              transform: `translate3d(0, ${heroShift}px, 0)`,
+              filter: `blur(${heroBlur * 0.65}px)`,
             }}
-            aria-hidden="true"
           >
-            <svg className="stardome-circle-path" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path
-                pathLength="1"
-                d="M 8 78 A 42 42 0 1 1 92 78"
-              />
-            </svg>
+            <button className="hero-cta">Explore</button>
+          </div>
+          <div className="scroll-indicator" aria-hidden="true">
+            <span></span>
+          </div>
+        </section>
+      </main>
+
+      <section
+        className={`about-stage ${aboutInFront ? 'about-stage--front' : 'about-stage--behind'}`}
+        id="about"
+      >
+        <div className="about-wrap">
+          <article
+            data-reveal-id="about-intro"
+            className={`about-intro reveal ${visibleSections['about-intro'] ? 'is-visible' : ''}`}
+          >
+            <p className="about-kicker">Who We Are</p>
+            <h2>
+              We build high-reliability electronics and intelligent platforms
+              that turn complex operations into measurable, scalable systems.
+            </h2>
+            <p>
+              Arya Electronics combines hardware design, embedded systems,
+              cloud telemetry, and industrial software under one execution team.
+              From prototype to production, we ship products engineered for long
+              lifecycle performance.
+            </p>
+          </article>
+
+          <div className="about-metrics">
+            {aboutMetrics.map((metric, index) => (
+              <article
+                key={metric.label}
+                data-reveal-id={`metric-${index}`}
+                className={`metric-item reveal ${visibleSections[`metric-${index}`] ? 'is-visible' : ''}`}
+                style={{ '--delay': `${index * 90}ms` }}
+              >
+                <p className="metric-value">{metric.value}</p>
+                <p className="metric-label">{metric.label}</p>
+              </article>
+            ))}
           </div>
 
-          <h2
-            className="stardome-title"
-            style={{
-              opacity: stardomeTitleReveal,
-              transform: `translate(-50%, calc(-50% + ${(1 - stardomeTitleReveal) * 24}px))`,
-            }}
-          >
-            STARDOME
-          </h2>
+          <div className="about-grid">
+            <article
+              data-reveal-id="about-core"
+              className={`about-block about-block--lead reveal ${visibleSections['about-core'] ? 'is-visible' : ''}`}
+              style={{ '--delay': '140ms' }}
+            >
+              <p className="about-kicker">How We Work</p>
+              <h3>Fast iterations, zero compromise on quality.</h3>
+              <p>
+                Every engagement runs through a shared engineering operating
+                model: architecture sprint, validation loop, pilot rollout,
+                and production hardening. This keeps delivery fast without
+                sacrificing reliability.
+              </p>
+              <div className="about-tags" aria-label="Capabilities">
+                <span>Embedded Design</span>
+                <span>Industrial IoT</span>
+                <span>Firmware & RTOS</span>
+                <span>Data Platforms</span>
+              </div>
+            </article>
+
+            <div className="about-column">
+              {aboutPanels.map((panel, index) => (
+                <article
+                  key={panel.id}
+                  data-reveal-id={`panel-${panel.id}`}
+                  className={`about-block reveal ${visibleSections[`panel-${panel.id}`] ? 'is-visible' : ''}`}
+                  style={{ '--delay': `${220 + index * 90}ms` }}
+                >
+                  <h3>{panel.title}</h3>
+                  <p>{panel.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
-
-      <section className="stardome-rover-gap" aria-hidden="true">
-        <div className="stardome-rover-gap-stars" />
-      </section>
-
-      <section className="rover-section" ref={roverSectionRef}>
-        <div className="rover-sticky">
-          <video
-            ref={roverVideoRef}
-            className="rover-video"
-            src={roverVideoUrl}
-            muted
-            playsInline
-            preload="auto"
-            aria-label="Scroll synced rover movement sequence"
-          />
-
-          <div className="sequence-shade" aria-hidden="true" />
-
-          <h2
-            className="rover-title-text"
-            style={{
-              opacity: roverTextReveal,
-              transform: `translate(-50%, calc(-50% + ${(1 - roverTextReveal) * 30}px)) scale(${0.9 + roverTextReveal * 0.1})`,
-            }}
-          >
-            ROVER
-          </h2>
-
-          {!roverVideoReady && <p className="sequence-loading rover-loading">Loading sequence...</p>}
-        </div>
-      </section>
-    </main>
+    </div>
   )
 }
+
+useGLTF.preload('/models/mars.glb')
 
 export default App
