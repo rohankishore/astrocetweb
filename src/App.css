@@ -20,7 +20,7 @@
 
 .app-shell {
   position: relative;
-  min-height: 390vh;
+  min-height: 480vh;
   color: var(--ink-main);
   background: #000;
   overflow-x: clip;

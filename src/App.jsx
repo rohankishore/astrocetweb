@@ -37,9 +37,12 @@ const clubHighlights = [
 ]
 
 const marsPhases = {
-  rightMoveStart: 0.42,
-  rightMoveEnd: 0.62,
-  leftMoveStart: 0.74,
+  rightMoveStart: 0.3,
+  rightMoveEnd: 0.45,
+  leftMoveStart: 0.55,
+  leftMoveEnd: 0.68,
+  centerMoveStart: 0.8,
+  centerMoveEnd: 0.95,
 }
 
 function clamp(value, min, max) {
@@ -86,10 +89,10 @@ function MarsModel({ progress }) {
       material.map.needsUpdate = true
     }
 
-    material.roughness = 0.9
-    material.metalness = 0.03
-    material.emissive = new THREE.Color('#2b150f')
-    material.emissiveIntensity = 0.28
+    material.roughness = 0.8
+    material.metalness = 0.05
+    material.emissive = new THREE.Color('#381b13')
+    material.emissiveIntensity = 0.45
     material.needsUpdate = true
 
     return { geometry, material, radius }
@@ -117,10 +120,15 @@ function MarsModel({ progress }) {
 
     const rightPhaseStart = marsPhases.rightMoveStart
     const rightPhaseEnd = marsPhases.rightMoveEnd
-    const holdPhaseEnd = marsPhases.leftMoveStart
+    const leftPhaseStart = marsPhases.leftMoveStart
+    const leftPhaseEnd = marsPhases.leftMoveEnd
+    const centerPhaseStart = marsPhases.centerMoveStart
+    const centerPhaseEnd = marsPhases.centerMoveEnd
+
     const toHeroEnd = clamp(t / rightPhaseStart, 0, 1)
     const toRight = clamp((t - rightPhaseStart) / (rightPhaseEnd - rightPhaseStart), 0, 1)
-    const toLeft = clamp((t - holdPhaseEnd) / (1 - holdPhaseEnd), 0, 1)
+    const toLeft = clamp((t - leftPhaseStart) / (leftPhaseEnd - leftPhaseStart), 0, 1)
+    const toCenter = clamp((t - centerPhaseStart) / (centerPhaseEnd - centerPhaseStart), 0, 1)
 
     const xAtHeroEnd = isMobile ? 0.16 : 0.56
     const xRight = isMobile ? 1.02 : 3.02
@@ -151,18 +159,30 @@ function MarsModel({ progress }) {
       scale = THREE.MathUtils.lerp(scaleAtHeroEnd, scaleAtRight, toRight)
       rotationX = THREE.MathUtils.lerp(0.06, 0.02, toRight)
       rotationZ = THREE.MathUtils.lerp(0, 0.08, toRight)
-    } else if (t <= holdPhaseEnd) {
+    } else if (t <= leftPhaseStart) {
       x = xRight
       y = yRight
       scale = scaleAtRight
       rotationX = 0.02
       rotationZ = 0.08
-    } else {
+    } else if (t <= leftPhaseEnd) {
       x = THREE.MathUtils.lerp(xRight, xLeft, toLeft)
       y = THREE.MathUtils.lerp(yRight, yLeft, toLeft)
       scale = THREE.MathUtils.lerp(scaleAtRight, endScale, toLeft)
       rotationX = THREE.MathUtils.lerp(0.02, 0.08, toLeft)
       rotationZ = THREE.MathUtils.lerp(0.08, -0.04, toLeft)
+    } else if (t <= centerPhaseStart) {
+      x = xLeft
+      y = yLeft
+      scale = endScale
+      rotationX = 0.08
+      rotationZ = -0.04
+    } else {
+      x = THREE.MathUtils.lerp(xLeft, xStart, toCenter)
+      y = THREE.MathUtils.lerp(yLeft, yStart + 0.35, toCenter) // adjust slightly compared to start so bottom sits well
+      scale = THREE.MathUtils.lerp(endScale, startScale * 1.15, toCenter) // zooomed in
+      rotationX = THREE.MathUtils.lerp(0.08, 0.25, toCenter)
+      rotationZ = THREE.MathUtils.lerp(-0.04, 0, toCenter)
     }
 
     groupRef.current.scale.setScalar(scale)
@@ -196,10 +216,10 @@ function SpaceScene({ progress }) {
         gl.setClearColor('#000000', 0)
       }}
     >
-      <ambientLight intensity={0.58} />
-      <hemisphereLight intensity={0.44} color="#bed7ff" groundColor="#101a2d" />
-      <directionalLight position={[5.5, 4.5, 5.2]} intensity={1.16} color="#a6d3ff" />
-      <directionalLight position={[-6, -2, -5]} intensity={0.5} color="#456ca3" />
+      <ambientLight intensity={0.9} />
+      <hemisphereLight intensity={0.65} color="#bed7ff" groundColor="#101a2d" />
+      <directionalLight position={[5.5, 4.5, 5.2]} intensity={1.6} color="#a6d3ff" />
+      <directionalLight position={[-6, -2, -5]} intensity={0.8} color="#456ca3" />
 
       <Stars
         radius={180}
@@ -281,7 +301,7 @@ function App() {
     return () => window.removeEventListener('mousemove', onMouseMove)
   }, [])
 
-  const sceneProgress = clamp(scrollProgress * 1.45, 0, 1)
+  const sceneProgress = clamp(scrollProgress * 1.15, 0, 1)
   const heroTransition = clamp(sceneProgress / 0.42, 0, 1)
   const aboutInFront = sceneProgress > 0.62
   const showNavItems = sceneProgress > 0.16
@@ -289,6 +309,23 @@ function App() {
   const heroShift = heroTransition * 108
   const heroBlur = heroTransition * 16
   const heroScale = 1 + heroTransition * 0.08
+
+  const centerMoveProgress = clamp(
+    (sceneProgress - marsPhases.centerMoveStart) /
+      (marsPhases.centerMoveEnd - marsPhases.centerMoveStart),
+    0,
+    1,
+  )
+
+  const endTitleOpacity = clamp((centerMoveProgress - 0.1) / 0.5, 0, 1)
+  const endTitleShift = (1 - centerMoveProgress) * 120
+  const endTitleScale = 1 + (1 - centerMoveProgress) * 0.1
+
+  // Use max to mix the first hero state and final state for the background title
+  const finalTitleOpacity = Math.max(heroOpacity, endTitleOpacity)
+  const finalTitleShift = heroOpacity > 0 ? heroShift : endTitleShift
+  const finalTitleBlur = heroOpacity > 0 ? heroBlur : 0
+  const finalTitleScale = heroOpacity > 0 ? heroScale : endTitleScale
 
   const rightMoveProgress = clamp(
     (sceneProgress - marsPhases.rightMoveStart) /
@@ -333,9 +370,9 @@ function App() {
         className="hero-behind-title"
         aria-hidden="true"
         style={{
-          opacity: heroOpacity,
-          filter: `blur(${heroBlur}px)`,
-          transform: `translate3d(-50%, -50%, 0) scale(${heroScale})`,
+          opacity: finalTitleOpacity,
+          filter: `blur(${finalTitleBlur}px)`,
+          transform: `translate3d(-50%, calc(-50% + ${finalTitleShift}px), 0) scale(${finalTitleScale})`,
         }}
       >
         ASTROCET
