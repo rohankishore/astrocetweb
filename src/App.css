@@ -552,6 +552,14 @@ main {
     min-height: 360vh;
   }
 
+  .hero-behind-title-wrap {
+    top: 25vh;
+  }
+
+  .hero-behind-title-wrap h1 {
+    font-size: clamp(2.5rem, 14vw, 5rem);
+  }
+
   .top-nav {
     padding: 1rem 1rem;
   }

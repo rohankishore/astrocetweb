@@ -130,13 +130,13 @@ function MarsModel({ progress }) {
     const toLeft = clamp((t - leftPhaseStart) / (leftPhaseEnd - leftPhaseStart), 0, 1)
     const toCenter = clamp((t - centerPhaseStart) / (centerPhaseEnd - centerPhaseStart), 0, 1)
 
-    const xAtHeroEnd = isMobile ? 0.16 : 0.56
-    const xRight = isMobile ? 0.95 : 2.15
-    const xLeft = isMobile ? -0.8 : -1.95
+    const xAtHeroEnd = isMobile ? 0.0 : 0.56
+    const xRight = isMobile ? 0.0 : 2.15
+    const xLeft = isMobile ? 0.0 : -1.95
 
-    const yAtHeroEnd = isMobile ? -0.45 : -0.18
-    const yRight = isMobile ? -0.34 : -0.1
-    const yLeft = isMobile ? -0.38 : -0.16
+    const yAtHeroEnd = isMobile ? -2.2 : -0.18
+    const yRight = isMobile ? 1.4 : -0.1
+    const yLeft = isMobile ? 1.4 : -0.16
 
     const scaleAtHeroEnd = THREE.MathUtils.lerp(startScale, endScale, 0.72)
     const scaleAtRight = endScale * 0.92
@@ -179,7 +179,7 @@ function MarsModel({ progress }) {
       rotationZ = -0.04
     } else {
       x = THREE.MathUtils.lerp(xLeft, xStart, toCenter)
-      y = THREE.MathUtils.lerp(yLeft, yStart - 0.55, toCenter) // Lowering Mars so top half covers text bottom
+      y = THREE.MathUtils.lerp(yLeft, isMobile ? yStart - 1.2 : yStart - 0.55, toCenter) // Lowering Mars so top half covers text bottom
       scale = THREE.MathUtils.lerp(endScale, startScale * 1.05, toCenter) // zoomed in
       rotationX = THREE.MathUtils.lerp(0.08, 0.25, toCenter)
       rotationZ = THREE.MathUtils.lerp(-0.04, 0, toCenter)
@@ -319,7 +319,7 @@ function App() {
   const showNavItems = sceneProgress > 0.16 && centerMoveProgress < 0.1
 
   const endTitleOpacity = clamp((centerMoveProgress - 0.2) / 0.5, 0, 1)
-  const endTitleShift = (1 - centerMoveProgress) * 140 - 75 // Rises 75px higher than the hero text did to show 3/4 above Mars
+  const endTitleShift = (1 - centerMoveProgress) * 140 - (window.innerWidth < 768 ? 40 : 75) // Rises higher than the hero text did to show 3/4 above Mars
   const endTitleScale = 1 + (1 - centerMoveProgress) * 0.1
 
   // Use max to mix the first hero state and final state for the background title
