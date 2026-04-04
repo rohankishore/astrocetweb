@@ -8,39 +8,45 @@ import { Stars, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import './App.css'
 
-const navItems = ['Home', 'About', 'Mission', 'News', 'Contact']
+const navItems = [
+  { label: 'Home', href: '#home' },
+  { label: 'Events', href: '#events' },
+  { label: 'Blogs', href: '#blogs' },
+  { label: 'Team', href: '#team' },
+  { label: 'Contact us', href: '#contact' },
+]
 
 const aboutMetrics = [
   {
-    value: '280+',
-    label: 'Production deployments completed',
+    value: '2019',
+    label: 'Founded as a student hobby club',
   },
   {
-    value: '42',
-    label: 'Engineers across hardware and software',
+    value: 'CET',
+    label: 'College of Engineering Trivandrum',
   },
   {
-    value: '99.2%',
-    label: 'Average uptime for live industrial systems',
+    value: 'Astronomy',
+    label: 'Focused learning and sky exploration',
   },
   {
-    value: '24/7',
-    label: 'Support and remote diagnostics coverage',
+    value: 'Outreach',
+    label: 'Activities for students and the public',
   },
 ]
 
 const aboutPanels = [
   {
-    id: 'precision',
-    title: 'Precision Engineering',
+    id: 'vision',
+    title: 'Vision',
     body:
-      'We design resilient electronics and controls with rigorous validation so products stay stable in high-noise, high-load environments.',
+      'AstroCET aims to lead astronomy education and outreach by inspiring students and the public to explore the cosmos through skill development, collaboration, and innovation.',
   },
   {
-    id: 'intelligence',
-    title: 'Intelligent Software',
+    id: 'mission',
+    title: 'Mission',
     body:
-      'Telemetry pipelines, predictive analytics, and real-time observability are built in from day one to keep systems measurable and adaptable.',
+      "The club's primary mission is to ignite passion for astronomy by providing a platform for learning, exploration, and innovation.",
   },
 ]
 
@@ -115,7 +121,7 @@ function MarsModel({ progress }) {
     const startScale = targetStartRadius / meshAsset.radius
     const endScale = targetEndRadius / meshAsset.radius
     const xStart = isMobile ? 0 : -0.05
-    const xEnd = isMobile ? 0.86 : 2.72
+    const xEnd = isMobile ? -0.78 : -2.72
     const yStart = isMobile ? -3.85 : -5.35
     const yEnd = isMobile ? -0.38 : -0.16
 
@@ -178,6 +184,10 @@ function App() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [visibleSections, setVisibleSections] = useState({})
   const rafRef = useRef(0)
+
+  const handleSubscribe = (event) => {
+    event.preventDefault()
+  }
 
   useEffect(() => {
     const getProgress = () => {
@@ -262,22 +272,22 @@ function App() {
 
       <header className={`top-nav ${sceneProgress > 0.08 ? 'top-nav--solid' : ''}`}>
         <a href="#" className={`brand ${showNavItems ? '' : 'brand--hidden'}`}>
-          Astrocet
+          astroCET
         </a>
         <nav
           className={`menu ${showNavItems ? '' : 'menu--hidden'}`}
           aria-label="Primary"
         >
           {navItems.map((item) => (
-            <a key={item} href="#">
-              {item}
+            <a key={item.label} href={item.href}>
+              {item.label}
             </a>
           ))}
         </nav>
       </header>
 
       <main>
-        <section className="hero-stage">
+        <section className="hero-stage" id="home">
           <div
             className="hero-copy"
             style={{
@@ -303,16 +313,14 @@ function App() {
             data-reveal-id="about-intro"
             className={`about-intro reveal ${visibleSections['about-intro'] ? 'is-visible' : ''}`}
           >
-            <p className="about-kicker">Who We Are</p>
+            <p className="about-kicker">astroCET</p>
             <h2>
-              We build high-reliability electronics and intelligent platforms
-              that turn complex operations into measurable, scalable systems.
+              College of Engineering Trivandrum astronomy club.
             </h2>
             <p>
-              Astrocet combines hardware design, embedded systems,
-              cloud telemetry, and industrial software under one execution team.
-              From prototype to production, we ship products engineered for long
-              lifecycle performance.
+              AstroCET is the astronomy club of CET Trivandrum. Started in 2019
+              as a hobby club, it has grown into an active student community for
+              celestial observation, technical learning, and public outreach.
             </p>
           </article>
 
@@ -336,19 +344,18 @@ function App() {
               className={`about-block about-block--lead reveal ${visibleSections['about-core'] ? 'is-visible' : ''}`}
               style={{ '--delay': '140ms' }}
             >
-              <p className="about-kicker">How We Work</p>
-              <h3>Fast iterations, zero compromise on quality.</h3>
+              <p className="about-kicker">Astro Story</p>
+              <h3>A student-led club focused on astronomy.</h3>
               <p>
-                Every engagement runs through a shared engineering operating
-                model: architecture sprint, validation loop, pilot rollout,
-                and production hardening. This keeps delivery fast without
-                sacrificing reliability.
+                From observation sessions to technical activities, AstroCET
+                creates an inclusive space where students collaborate, build
+                practical skills, and explore the universe together.
               </p>
-              <div className="about-tags" aria-label="Capabilities">
-                <span>Embedded Design</span>
-                <span>Industrial IoT</span>
-                <span>Firmware & RTOS</span>
-                <span>Data Platforms</span>
+              <div className="about-tags" aria-label="Club highlights">
+                <span>Past Events</span>
+                <span>Announcements</span>
+                <span>Gallery</span>
+                <span>Contact Us</span>
               </div>
             </article>
 
@@ -366,6 +373,66 @@ function App() {
               ))}
             </div>
           </div>
+
+          <div className="club-grid">
+            <article
+              id="events"
+              data-reveal-id="events"
+              className={`club-card reveal ${visibleSections['events'] ? 'is-visible' : ''}`}
+              style={{ '--delay': '260ms' }}
+            >
+              <p className="about-kicker">Events</p>
+              <h3>Past Events & Announcements</h3>
+              <p>
+                AstroCET hosts night-sky observations, introductory astronomy
+                sessions, and regular announcements for upcoming activities.
+              </p>
+            </article>
+
+            <article
+              id="blogs"
+              data-reveal-id="blogs"
+              className={`club-card reveal ${visibleSections['blogs'] ? 'is-visible' : ''}`}
+              style={{ '--delay': '320ms' }}
+            >
+              <p className="about-kicker">Blogs</p>
+              <h3>Knowledge from the club</h3>
+              <p>
+                Members publish astronomy notes and explainers to help beginners
+                and enthusiasts stay connected with what we learn.
+              </p>
+            </article>
+
+            <article
+              id="team"
+              data-reveal-id="team"
+              className={`club-card reveal ${visibleSections['team'] ? 'is-visible' : ''}`}
+              style={{ '--delay': '380ms' }}
+            >
+              <p className="about-kicker">Team</p>
+              <h3>Built by CET students</h3>
+              <p>
+                The club is run by passionate students from CET Trivandrum who
+                work together on astronomy outreach and technical activities.
+              </p>
+            </article>
+
+            <article
+              id="contact"
+              data-reveal-id="contact"
+              className={`club-card reveal ${visibleSections['contact'] ? 'is-visible' : ''}`}
+              style={{ '--delay': '440ms' }}
+            >
+              <p className="about-kicker">Contact Us</p>
+              <h3>Enter your email to subscribe</h3>
+              <form className="contact-form" onSubmit={handleSubscribe}>
+                <input type="email" placeholder="Enter your email" required />
+                <button type="submit">Send</button>
+              </form>
+            </article>
+          </div>
+
+          <p className="site-credit reveal is-visible">Made by AstroCET. All rights reserved.</p>
         </div>
       </section>
     </div>
