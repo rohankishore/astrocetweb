@@ -2,6 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import Lenis from 'lenis'
 import './App.css'
 
 const navItems = [
