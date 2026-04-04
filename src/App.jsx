@@ -8,39 +8,39 @@ import { Stars, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import './App.css'
 
-const navItems = ['Home', 'About', 'Mission', 'News', 'Contact']
+const navItems = ['Home', 'Events', 'Blogs', 'Team', 'Contact Us']
 
 const aboutMetrics = [
   {
-    value: '280+',
-    label: 'Production deployments completed',
+    value: '2019',
+    label: 'Founded as a student hobby club',
   },
   {
-    value: '42',
-    label: 'Engineers across hardware and software',
+    value: 'CET',
+    label: 'College of Engineering Trivandrum',
   },
   {
-    value: '99.2%',
-    label: 'Average uptime for live industrial systems',
+    value: 'Campus',
+    label: 'Astronomy sessions and peer learning',
   },
   {
-    value: '24/7',
-    label: 'Support and remote diagnostics coverage',
+    value: 'Public',
+    label: 'Outreach and skywatch initiatives',
   },
 ]
 
 const aboutPanels = [
   {
-    id: 'precision',
-    title: 'Precision Engineering',
+    id: 'vision',
+    title: 'Vision',
     body:
-      'We design resilient electronics and controls with rigorous validation so products stay stable in high-noise, high-load environments.',
+      'AstroCET aims to lead astronomy education and outreach by inspiring students and the public to explore the cosmos through skill development, collaboration, and innovation.',
   },
   {
-    id: 'intelligence',
-    title: 'Intelligent Software',
+    id: 'mission',
+    title: 'Mission',
     body:
-      'Telemetry pipelines, predictive analytics, and real-time observability are built in from day one to keep systems measurable and adaptable.',
+      'Our mission is to ignite curiosity in astronomy among students and the wider community, and provide a practical platform for learning, observation, and experimentation.',
   },
 ]
 
@@ -114,8 +114,8 @@ function MarsModel({ progress }) {
     const targetEndRadius = isMobile ? 1.9 : 2.45
     const startScale = targetStartRadius / meshAsset.radius
     const endScale = targetEndRadius / meshAsset.radius
-    const xStart = isMobile ? 0 : -0.05
-    const xEnd = isMobile ? 0.86 : 2.72
+    const xStart = isMobile ? 0 : 0.02
+    const xEnd = isMobile ? -0.72 : -2.72
     const yStart = isMobile ? -3.85 : -5.35
     const yEnd = isMobile ? -0.38 : -0.16
 
@@ -262,7 +262,7 @@ function App() {
 
       <header className={`top-nav ${sceneProgress > 0.08 ? 'top-nav--solid' : ''}`}>
         <a href="#" className={`brand ${showNavItems ? '' : 'brand--hidden'}`}>
-          Astrocet
+          astroCET
         </a>
         <nav
           className={`menu ${showNavItems ? '' : 'menu--hidden'}`}
@@ -303,16 +303,16 @@ function App() {
             data-reveal-id="about-intro"
             className={`about-intro reveal ${visibleSections['about-intro'] ? 'is-visible' : ''}`}
           >
-            <p className="about-kicker">Who We Are</p>
+            <p className="about-kicker">Astro-Boy Story</p>
             <h2>
-              We build high-reliability electronics and intelligent platforms
-              that turn complex operations into measurable, scalable systems.
+              AstroCET is the astronomy club of the
+              College of Engineering Trivandrum.
             </h2>
             <p>
-              Astrocet combines hardware design, embedded systems,
-              cloud telemetry, and industrial software under one execution team.
-              From prototype to production, we ship products engineered for long
-              lifecycle performance.
+              Started in 2019 as a humble hobby club, AstroCET has grown into a
+              strong student community for celestial exploration. We bring
+              students together through observation, technical learning, and
+              collaborative projects that make astronomy practical and exciting.
             </p>
           </article>
 
@@ -336,19 +336,18 @@ function App() {
               className={`about-block about-block--lead reveal ${visibleSections['about-core'] ? 'is-visible' : ''}`}
               style={{ '--delay': '140ms' }}
             >
-              <p className="about-kicker">How We Work</p>
-              <h3>Fast iterations, zero compromise on quality.</h3>
+              <p className="about-kicker">Club Focus</p>
+              <h3>Events, blogs, teamwork, and outreach.</h3>
               <p>
-                Every engagement runs through a shared engineering operating
-                model: architecture sprint, validation loop, pilot rollout,
-                and production hardening. This keeps delivery fast without
-                sacrificing reliability.
+                Past events, announcements, gallery highlights, and student-led
+                initiatives are the heart of our community. We also keep an
+                active contact channel for updates and new members.
               </p>
               <div className="about-tags" aria-label="Capabilities">
-                <span>Embedded Design</span>
-                <span>Industrial IoT</span>
-                <span>Firmware & RTOS</span>
-                <span>Data Platforms</span>
+                <span>Events</span>
+                <span>Blogs</span>
+                <span>Team</span>
+                <span>Contact Us</span>
               </div>
             </article>
 
