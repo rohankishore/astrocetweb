@@ -151,13 +151,13 @@ function SpaceScene({ progress }) {
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => {
-        gl.setClearColor('#ddd0c2', 0)
+        gl.setClearColor('#02050f', 0)
       }}
     >
-      <ambientLight intensity={0.9} />
-      <hemisphereLight intensity={0.46} color="#fff8f3" groundColor="#b86a54" />
-      <directionalLight position={[5.5, 4.5, 5.2]} intensity={1.34} color="#ffd3c0" />
-      <directionalLight position={[-6, -2, -5]} intensity={0.33} color="#9faec9" />
+      <ambientLight intensity={0.58} />
+      <hemisphereLight intensity={0.44} color="#bed7ff" groundColor="#101a2d" />
+      <directionalLight position={[5.5, 4.5, 5.2]} intensity={1.16} color="#a6d3ff" />
+      <directionalLight position={[-6, -2, -5]} intensity={0.5} color="#456ca3" />
 
       <Stars
         radius={180}
@@ -255,14 +255,14 @@ function App() {
           transform: `translate3d(-50%, -50%, 0) scale(${heroScale})`,
         }}
       >
-        ARYA ELECTRONICS
+        ASTROCET
       </h1>
 
       <div className="star-dots" aria-hidden="true"></div>
 
       <header className={`top-nav ${sceneProgress > 0.08 ? 'top-nav--solid' : ''}`}>
         <a href="#" className={`brand ${showNavItems ? '' : 'brand--hidden'}`}>
-          Arya Electronics
+          Astrocet
         </a>
         <nav
           className={`menu ${showNavItems ? '' : 'menu--hidden'}`}
@@ -286,7 +286,13 @@ function App() {
               filter: `blur(${heroBlur * 0.65}px)`,
             }}
           >
-            <button className="hero-cta">Explore</button>
+            <p className="hero-eyebrow">Deep-Space Electronics</p>
+            <h2 className="hero-title">Mission-ready systems for the void.</h2>
+            <p className="hero-subtitle">
+              Astrocet designs resilient hardware and intelligent telemetry
+              platforms for extreme, high-noise environments.
+            </p>
+            <button className="hero-cta">Enter Orbit</button>
           </div>
           <div className="scroll-indicator" aria-hidden="true">
             <span></span>
@@ -309,7 +315,7 @@ function App() {
               that turn complex operations into measurable, scalable systems.
             </h2>
             <p>
-              Arya Electronics combines hardware design, embedded systems,
+              Astrocet combines hardware design, embedded systems,
               cloud telemetry, and industrial software under one execution team.
               From prototype to production, we ship products engineered for long
               lifecycle performance.

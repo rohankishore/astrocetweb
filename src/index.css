@@ -22,8 +22,8 @@ body,
 
 body {
   overflow-x: hidden;
-  background: #ddd0c2;
-  color: #2b3040;
+  background: #040712;
+  color: #dce9ff;
   font-family: var(--font-sans);
   font-size: 18px;
   text-rendering: optimizeLegibility;
