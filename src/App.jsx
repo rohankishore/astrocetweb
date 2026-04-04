@@ -121,18 +121,55 @@ function MarsModel({ progress }) {
     const startScale = targetStartRadius / meshAsset.radius
     const endScale = targetEndRadius / meshAsset.radius
     const xStart = isMobile ? 0 : -0.05
-    const xEnd = isMobile ? -0.78 : -2.72
     const yStart = isMobile ? -3.85 : -5.35
-    const yEnd = isMobile ? -0.38 : -0.16
 
-    const scale = THREE.MathUtils.lerp(startScale, endScale, t)
-    const x = THREE.MathUtils.lerp(xStart, xEnd, t)
-    const y = THREE.MathUtils.lerp(yStart, yEnd, t)
+    const rightPhaseStart = 0.42
+    const rightPhaseEnd = 0.72
+    const toHeroEnd = clamp(t / rightPhaseStart, 0, 1)
+    const toRight = clamp((t - rightPhaseStart) / (rightPhaseEnd - rightPhaseStart), 0, 1)
+    const toLeft = clamp((t - rightPhaseEnd) / (1 - rightPhaseEnd), 0, 1)
+
+    const xAtHeroEnd = isMobile ? 0.16 : 0.56
+    const xRight = isMobile ? 1.02 : 3.02
+    const xLeft = isMobile ? -0.86 : -2.72
+
+    const yAtHeroEnd = isMobile ? -0.45 : -0.18
+    const yRight = isMobile ? -0.34 : -0.1
+    const yLeft = isMobile ? -0.38 : -0.16
+
+    const scaleAtHeroEnd = THREE.MathUtils.lerp(startScale, endScale, 0.72)
+    const scaleAtRight = endScale * 0.92
+
+    let x = xStart
+    let y = yStart
+    let scale = startScale
+    let rotationX = 0.2
+    let rotationZ = -0.06
+
+    if (t <= rightPhaseStart) {
+      x = THREE.MathUtils.lerp(xStart, xAtHeroEnd, toHeroEnd)
+      y = THREE.MathUtils.lerp(yStart, yAtHeroEnd, toHeroEnd)
+      scale = THREE.MathUtils.lerp(startScale, scaleAtHeroEnd, toHeroEnd)
+      rotationX = THREE.MathUtils.lerp(0.2, 0.06, toHeroEnd)
+      rotationZ = THREE.MathUtils.lerp(-0.06, 0, toHeroEnd)
+    } else if (t <= rightPhaseEnd) {
+      x = THREE.MathUtils.lerp(xAtHeroEnd, xRight, toRight)
+      y = THREE.MathUtils.lerp(yAtHeroEnd, yRight, toRight)
+      scale = THREE.MathUtils.lerp(scaleAtHeroEnd, scaleAtRight, toRight)
+      rotationX = THREE.MathUtils.lerp(0.06, 0.02, toRight)
+      rotationZ = THREE.MathUtils.lerp(0, 0.08, toRight)
+    } else {
+      x = THREE.MathUtils.lerp(xRight, xLeft, toLeft)
+      y = THREE.MathUtils.lerp(yRight, yLeft, toLeft)
+      scale = THREE.MathUtils.lerp(scaleAtRight, endScale, toLeft)
+      rotationX = THREE.MathUtils.lerp(0.02, 0.08, toLeft)
+      rotationZ = THREE.MathUtils.lerp(0.08, -0.04, toLeft)
+    }
 
     groupRef.current.scale.setScalar(scale)
     groupRef.current.position.set(x, y, -0.25)
-    groupRef.current.rotation.x = THREE.MathUtils.lerp(0.2, 0.04, t)
-    groupRef.current.rotation.z = THREE.MathUtils.lerp(-0.06, 0.02, t)
+    groupRef.current.rotation.x = rotationX
+    groupRef.current.rotation.z = rotationZ
     groupRef.current.rotation.y += delta * 0.12
   })
 
@@ -247,6 +284,7 @@ function App() {
   const heroShift = heroTransition * 108
   const heroBlur = heroTransition * 16
   const heroScale = 1 + heroTransition * 0.08
+  const contentOnRight = sceneProgress > 0.72
 
   return (
     <div className="app-shell">
@@ -305,7 +343,7 @@ function App() {
       </main>
 
       <section
-        className={`about-stage ${aboutInFront ? 'about-stage--front' : 'about-stage--behind'}`}
+        className={`about-stage ${aboutInFront ? 'about-stage--front' : 'about-stage--behind'} ${contentOnRight ? 'about-stage--content-right' : 'about-stage--content-left'}`}
         id="about"
       >
         <div className="about-wrap">
