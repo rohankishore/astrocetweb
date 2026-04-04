@@ -1,7 +1,3 @@
-/* man its so hard not to act reckless */
-/* why am i so peak? */
-
-
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Stars, useGLTF } from '@react-three/drei'
@@ -261,7 +257,6 @@ function App() {
   const heroBlur = heroTransition * 16
   const heroScale = 1 + heroTransition * 0.08
 
-  // Story panels are driven by Mars movement phases for cleaner visual sync.
   const rightMoveProgress = clamp(
     (sceneProgress - marsPhases.rightMoveStart) /
       (marsPhases.rightMoveEnd - marsPhases.rightMoveStart),
@@ -275,12 +270,10 @@ function App() {
     1,
   )
 
-  // Left content fades in while Mars is moving right, then fades out as Mars moves left.
   const leftFadeIn = clamp((rightMoveProgress - 0.28) / 0.56, 0, 1)
   const leftFadeOut = clamp((leftMoveProgress - 0.16) / 0.46, 0, 1)
   const leftStoryFade = clamp(leftFadeIn * (1 - leftFadeOut), 0, 1)
 
-  // Right content fades in while Mars is moving left, before it fully settles.
   const rightStoryFade = clamp((leftMoveProgress - 0.24) / 0.58, 0, 1)
 
   const leftStoryStyle = {
@@ -317,7 +310,7 @@ function App() {
 
       <div className="star-dots" aria-hidden="true"></div>
 
-      <header className={`top-nav ${sceneProgress > 0.08 ? 'top-nav--solid' : ''}`}>
+      <header className="top-nav">
         <a href="#" className={`brand ${showNavItems ? '' : 'brand--hidden'}`}>
           astroCET
         </a>
@@ -393,7 +386,6 @@ function App() {
             </div>
 
             {clubHighlights.map((item, index) => {
-              // Creating a staggered story-like fade for each club highlight
               const startFade = 0.78 + index * 0.06;
               const itemFade = clamp((sceneProgress - startFade) / 0.1, 0, 1);
               

@@ -1,3 +1,5 @@
+/*Bit of ai slop used here since im not familiar with 3d tracking with layered css*/
+
 :root {
   --cream-top: #000000;
   --cream-mid: #000000;
@@ -40,7 +42,7 @@
 .star-dots {
   position: fixed;
   inset: 0;
-  z-index: 3;
+  z-index: 1;
   pointer-events: none;
   background-image:
     radial-gradient(circle at 24% 20%, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.7px),
@@ -438,8 +440,9 @@ main {
 }
 
 .site-credit {
-  width: min(980px, 100%);
-  margin: 1.7rem auto 0 0;
+  width: 100%;
+  margin: 4rem auto 0;
+  text-align: center;
   font-size: 0.76rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
