@@ -221,7 +221,6 @@ function SpaceScene({ progress }) {
 
 function App() {
   const [scrollProgress, setScrollProgress] = useState(0)
-  const [visibleSections, setVisibleSections] = useState({})
   const rafRef = useRef(0)
 
   useEffect(() => {
@@ -251,27 +250,6 @@ function App() {
         window.cancelAnimationFrame(rafRef.current)
       }
     }
-  }, [])
-
-  useEffect(() => {
-    const nodes = Array.from(document.querySelectorAll('[data-reveal-id]'))
-    if (!nodes.length) return undefined
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          const id = entry.target.getAttribute('data-reveal-id')
-          if (!id) return
-          setVisibleSections((prev) => (prev[id] ? prev : { ...prev, [id]: true }))
-          observer.unobserve(entry.target)
-        })
-      },
-      { threshold: 0.35 },
-    )
-
-    nodes.forEach((node) => observer.observe(node))
-    return () => observer.disconnect()
   }, [])
 
   const sceneProgress = clamp(scrollProgress * 1.45, 0, 1)
@@ -305,8 +283,6 @@ function App() {
   // Right content fades in while Mars is moving left, before it fully settles.
   const rightStoryFade = clamp((leftMoveProgress - 0.24) / 0.58, 0, 1)
 
-  const clubSectionsFade = clamp((sceneProgress - 0.9) / 0.08, 0, 1)
-
   const leftStoryStyle = {
     opacity: leftStoryFade,
     transform: `translate3d(${(1 - leftStoryFade) * -34}px, ${(1 - leftStoryFade) * 18}px, 0)`,
@@ -317,13 +293,6 @@ function App() {
     opacity: rightStoryFade,
     transform: `translate3d(${(1 - rightStoryFade) * 34}px, ${(1 - rightStoryFade) * 18}px, 0)`,
     filter: `blur(${(1 - rightStoryFade) * 7}px)`,
-  }
-
-  const clubSectionsStyle = {
-    opacity: clubSectionsFade,
-    transform: `translate3d(0, ${(1 - clubSectionsFade) * 26}px, 0)`,
-    filter: `blur(${(1 - clubSectionsFade) * 6}px)`,
-    pointerEvents: clubSectionsFade > 0.96 ? 'auto' : 'none',
   }
 
   return (
@@ -399,6 +368,11 @@ function App() {
                   Founded in 2019 as a student hobby club, AstroCET has grown
                   into a vibrant space for celestial observation, technical
                   learning, and community-driven exploration of the cosmos.
+                  We bring together students from various disciplines who share a 
+                  profound fascination for the universe. Whether you are a seasoned 
+                  stargazer or just looking up at the night sky for the first time, 
+                  our community offers a welcoming environment to learn, grow, and 
+                  discover the wonders of astronomy together.
                 </p>
               </article>
             </div>
@@ -417,22 +391,34 @@ function App() {
                 </p>
               </article>
             </div>
-          </div>
 
-          <div className="club-sections" style={clubSectionsStyle}>
-            {clubHighlights.map((item, index) => (
-              <article
-                key={item.id}
-                id={item.id}
-                data-reveal-id={`club-${item.id}`}
-                className={`club-item reveal ${visibleSections[`club-${item.id}`] ? 'is-visible' : ''}`}
-                style={{ '--delay': `${260 + index * 90}ms` }}
-              >
-                <p className="about-kicker">{item.kicker}</p>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </article>
-            ))}
+            {clubHighlights.map((item, index) => {
+              // Creating a staggered story-like fade for each club highlight
+              const startFade = 0.78 + index * 0.06;
+              const itemFade = clamp((sceneProgress - startFade) / 0.1, 0, 1);
+              
+              const itemStyle = {
+                opacity: itemFade,
+                transform: `translate3d(${(1 - itemFade) * 34}px, ${(1 - itemFade) * 18}px, 0)`,
+                filter: `blur(${(1 - itemFade) * 7}px)`,
+              };
+
+              return (
+                <div key={item.id} className="story-row story-row--right">
+                  <article
+                    id={item.id}
+                    className="story-panel club-panel"
+                    style={itemStyle}
+                  >
+                    <div className="club-item">
+                      <p className="about-kicker">{item.kicker}</p>
+                      <h3>{item.title}</h3>
+                      <p>{item.body}</p>
+                    </div>
+                  </article>
+                </div>
+              );
+            })}
           </div>
 
           <p className="site-credit reveal is-visible">Made by AstroCET. All rights reserved.</p>
