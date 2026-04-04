@@ -1,4 +1,4 @@
-/* man its so hard not to act reckless baammm baaamm bam bam */
+/* man its so hard not to act reckless */
 /* why am i so peak? */
 
 
@@ -151,7 +151,7 @@ function SpaceScene({ progress }) {
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => {
-        gl.setClearColor('#02050f', 0)
+        gl.setClearColor('#000000', 0)
       }}
     >
       <ambientLight intensity={0.58} />
@@ -286,13 +286,7 @@ function App() {
               filter: `blur(${heroBlur * 0.65}px)`,
             }}
           >
-            <p className="hero-eyebrow">Deep-Space Electronics</p>
-            <h2 className="hero-title">Mission-ready systems for the void.</h2>
-            <p className="hero-subtitle">
-              Astrocet designs resilient hardware and intelligent telemetry
-              platforms for extreme, high-noise environments.
-            </p>
-            <button className="hero-cta">Enter Orbit</button>
+            <button className="hero-cta">Explore</button>
           </div>
           <div className="scroll-indicator" aria-hidden="true">
             <span></span>
