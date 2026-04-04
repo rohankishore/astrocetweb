@@ -37,12 +37,12 @@ const clubHighlights = [
 ]
 
 const marsPhases = {
-  rightMoveStart: 0.3,
-  rightMoveEnd: 0.45,
-  leftMoveStart: 0.55,
-  leftMoveEnd: 0.68,
-  centerMoveStart: 0.8,
-  centerMoveEnd: 0.95,
+  rightMoveStart: 0.20,
+  rightMoveEnd: 0.35,
+  leftMoveStart: 0.45,
+  leftMoveEnd: 0.60,
+  centerMoveStart: 0.82,
+  centerMoveEnd: 0.98,
 }
 
 function clamp(value, min, max) {
@@ -131,8 +131,8 @@ function MarsModel({ progress }) {
     const toCenter = clamp((t - centerPhaseStart) / (centerPhaseEnd - centerPhaseStart), 0, 1)
 
     const xAtHeroEnd = isMobile ? 0.16 : 0.56
-    const xRight = isMobile ? 1.02 : 3.02
-    const xLeft = isMobile ? -0.86 : -2.72
+    const xRight = isMobile ? 0.95 : 2.15
+    const xLeft = isMobile ? -0.8 : -1.95
 
     const yAtHeroEnd = isMobile ? -0.45 : -0.18
     const yRight = isMobile ? -0.34 : -0.1
@@ -179,8 +179,8 @@ function MarsModel({ progress }) {
       rotationZ = -0.04
     } else {
       x = THREE.MathUtils.lerp(xLeft, xStart, toCenter)
-      y = THREE.MathUtils.lerp(yLeft, yStart + 0.35, toCenter) // adjust slightly compared to start so bottom sits well
-      scale = THREE.MathUtils.lerp(endScale, startScale * 1.15, toCenter) // zooomed in
+      y = THREE.MathUtils.lerp(yLeft, yStart - 0.55, toCenter) // Lowering Mars so top half covers text bottom
+      scale = THREE.MathUtils.lerp(endScale, startScale * 1.05, toCenter) // zoomed in
       rotationX = THREE.MathUtils.lerp(0.08, 0.25, toCenter)
       rotationZ = THREE.MathUtils.lerp(-0.04, 0, toCenter)
     }
@@ -317,8 +317,8 @@ function App() {
     1,
   )
 
-  const endTitleOpacity = clamp((centerMoveProgress - 0.1) / 0.5, 0, 1)
-  const endTitleShift = (1 - centerMoveProgress) * 120
+  const endTitleOpacity = clamp((centerMoveProgress - 0.2) / 0.5, 0, 1)
+  const endTitleShift = (1 - centerMoveProgress) * 140 - 75 // Rises 75px higher than the hero text did to show 3/4 above Mars
   const endTitleScale = 1 + (1 - centerMoveProgress) * 0.1
 
   // Use max to mix the first hero state and final state for the background title
@@ -327,25 +327,12 @@ function App() {
   const finalTitleBlur = heroOpacity > 0 ? heroBlur : 0
   const finalTitleScale = heroOpacity > 0 ? heroScale : endTitleScale
 
-  const rightMoveProgress = clamp(
-    (sceneProgress - marsPhases.rightMoveStart) /
-      (marsPhases.rightMoveEnd - marsPhases.rightMoveStart),
-    0,
-    1,
-  )
-  const leftMoveProgress = clamp(
-    (sceneProgress - marsPhases.leftMoveStart) /
-      (1 - marsPhases.leftMoveStart),
-    0,
-    1,
-  )
-
-  const leftFadeIn = clamp((rightMoveProgress - 0.28) / 0.56, 0, 1)
-  const leftFadeOut = clamp((leftMoveProgress - 0.16) / 0.46, 0, 1)
-  const masterFadeOut = clamp((centerMoveProgress - 0.1) / 0.3, 0, 1) // Fades everything out at the end
-  const leftStoryFade = clamp(leftFadeIn * (1 - leftFadeOut), 0, 1) * (1 - masterFadeOut)
-
-  const rightStoryFade = clamp((leftMoveProgress - 0.24) / 0.58, 0, 1) * (1 - masterFadeOut)
+  const leftStoryFadeIn = clamp((sceneProgress - 0.22) / 0.1, 0, 1)
+  const leftStoryFadeOut = clamp((sceneProgress - 0.4) / 0.1, 0, 1)
+  const masterFadeOut = clamp(centerMoveProgress / 0.35, 0, 1) // Fades everything out as Mars enters center
+  
+  const leftStoryFade = clamp(leftStoryFadeIn * (1 - leftStoryFadeOut), 0, 1) * (1 - masterFadeOut)
+  const rightStoryFade = clamp((sceneProgress - 0.48) / 0.15, 0, 1) * (1 - masterFadeOut)
 
   const leftStoryStyle = {
     opacity: leftStoryFade,
@@ -458,7 +445,7 @@ function App() {
             </div>
 
             {clubHighlights.map((item, index) => {
-              const startFade = 0.78 + index * 0.06;
+              const startFade = 0.58 + index * 0.07;
               const itemFade = clamp((sceneProgress - startFade) / 0.1, 0, 1) * (1 - masterFadeOut);
               
               const itemStyle = {
