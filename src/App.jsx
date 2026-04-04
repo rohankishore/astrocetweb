@@ -111,12 +111,12 @@ function MarsModel({ progress }) {
     const t = smoothedProgress.current
     const isMobile = viewport.width < 8
 
-    const targetStartRadius = isMobile ? 4.15 : 5.8
-    const targetEndRadius = isMobile ? 1.9 : 2.45
+    const targetStartRadius = isMobile ? 3.6 : 5.8
+    const targetEndRadius = isMobile ? 1.3 : 2.45
     const startScale = targetStartRadius / meshAsset.radius
     const endScale = targetEndRadius / meshAsset.radius
     const xStart = isMobile ? 0 : -0.05
-    const yStart = isMobile ? -3.85 : -5.35
+    const yStart = isMobile ? -2.8 : -5.35
 
     const rightPhaseStart = marsPhases.rightMoveStart
     const rightPhaseEnd = marsPhases.rightMoveEnd
@@ -130,13 +130,13 @@ function MarsModel({ progress }) {
     const toLeft = clamp((t - leftPhaseStart) / (leftPhaseEnd - leftPhaseStart), 0, 1)
     const toCenter = clamp((t - centerPhaseStart) / (centerPhaseEnd - centerPhaseStart), 0, 1)
 
-    const xAtHeroEnd = isMobile ? 0.0 : 0.56
-    const xRight = isMobile ? 0.0 : 2.15
-    const xLeft = isMobile ? 0.0 : -1.95
+    const xAtHeroEnd = isMobile ? 0.2 : 0.56
+    const xRight = isMobile ? 1.35 : 2.15
+    const xLeft = isMobile ? -1.35 : -1.95
 
-    const yAtHeroEnd = isMobile ? -2.2 : -0.18
-    const yRight = isMobile ? 1.4 : -0.1
-    const yLeft = isMobile ? 1.4 : -0.16
+    const yAtHeroEnd = isMobile ? -0.4 : -0.18
+    const yRight = isMobile ? 0.15 : -0.1
+    const yLeft = isMobile ? 0.2 : -0.16
 
     const scaleAtHeroEnd = THREE.MathUtils.lerp(startScale, endScale, 0.72)
     const scaleAtRight = endScale * 0.92
@@ -179,7 +179,7 @@ function MarsModel({ progress }) {
       rotationZ = -0.04
     } else {
       x = THREE.MathUtils.lerp(xLeft, xStart, toCenter)
-      y = THREE.MathUtils.lerp(yLeft, isMobile ? yStart - 1.2 : yStart - 0.55, toCenter) // Lowering Mars so top half covers text bottom
+      y = THREE.MathUtils.lerp(yLeft, isMobile ? yStart - 0.7 : yStart - 0.55, toCenter) // Lowering Mars so top half covers text bottom
       scale = THREE.MathUtils.lerp(endScale, startScale * 1.05, toCenter) // zoomed in
       rotationX = THREE.MathUtils.lerp(0.08, 0.25, toCenter)
       rotationZ = THREE.MathUtils.lerp(-0.04, 0, toCenter)
@@ -339,12 +339,14 @@ function App() {
     opacity: leftStoryFade,
     transform: `translate3d(${(1 - leftStoryFade) * -34}px, ${(1 - leftStoryFade) * 18}px, 0)`,
     filter: `blur(${(1 - leftStoryFade) * 7}px)`,
+    textShadow: window.innerWidth < 900 ? '0 2px 24px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,1)' : 'none',
   }
 
   const rightStoryStyle = {
     opacity: rightStoryFade,
     transform: `translate3d(${(1 - rightStoryFade) * 34}px, ${(1 - rightStoryFade) * 18}px, 0)`,
     filter: `blur(${(1 - rightStoryFade) * 7}px)`,
+    textShadow: window.innerWidth < 900 ? '0 2px 24px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,1)' : 'none',
   }
 
   return (
@@ -456,6 +458,7 @@ function App() {
                 opacity: itemFade,
                 transform: `translate3d(${(1 - itemFade) * 34}px, ${(1 - itemFade) * 18}px, 0)`,
                 filter: `blur(${(1 - itemFade) * 7}px)`,
+                textShadow: window.innerWidth < 900 ? '0 2px 24px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,1)' : 'none',
               };
 
               return (
