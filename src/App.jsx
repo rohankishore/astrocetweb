@@ -13,7 +13,30 @@ const navItems = [
   { label: 'Events', href: '#events' },
   { label: 'Blogs', href: '#blogs' },
   { label: 'Team', href: '#team' },
-  { label: 'Contact us', href: '#contact' },
+]
+
+const clubHighlights = [
+  {
+    id: 'events',
+    kicker: 'Events',
+    title: 'Past Events & Announcements',
+    body:
+      'AstroCET hosts night-sky observations, introductory astronomy sessions, and regular announcements for upcoming activities.',
+  },
+  {
+    id: 'blogs',
+    kicker: 'Blogs',
+    title: 'Knowledge From The Club',
+    body:
+      'Members publish astronomy notes and explainers to help beginners and enthusiasts stay connected with what we learn.',
+  },
+  {
+    id: 'team',
+    kicker: 'Team',
+    title: 'Built By CET Students',
+    body:
+      'The club is run by passionate students from CET Trivandrum who work together on astronomy outreach and technical activities.',
+  },
 ]
 
 const marsPhases = {
@@ -201,10 +224,6 @@ function App() {
   const [visibleSections, setVisibleSections] = useState({})
   const rafRef = useRef(0)
 
-  const handleSubscribe = (event) => {
-    event.preventDefault()
-  }
-
   useEffect(() => {
     const getProgress = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
@@ -286,7 +305,7 @@ function App() {
   // Right content fades in while Mars is moving left, before it fully settles.
   const rightStoryFade = clamp((leftMoveProgress - 0.24) / 0.58, 0, 1)
 
-  const clubGridFade = clamp((sceneProgress - 0.9) / 0.08, 0, 1)
+  const clubSectionsFade = clamp((sceneProgress - 0.9) / 0.08, 0, 1)
 
   const leftStoryStyle = {
     opacity: leftStoryFade,
@@ -300,11 +319,11 @@ function App() {
     filter: `blur(${(1 - rightStoryFade) * 7}px)`,
   }
 
-  const clubGridStyle = {
-    opacity: clubGridFade,
-    transform: `translate3d(0, ${(1 - clubGridFade) * 26}px, 0)`,
-    filter: `blur(${(1 - clubGridFade) * 6}px)`,
-    pointerEvents: clubGridFade > 0.96 ? 'auto' : 'none',
+  const clubSectionsStyle = {
+    opacity: clubSectionsFade,
+    transform: `translate3d(0, ${(1 - clubSectionsFade) * 26}px, 0)`,
+    filter: `blur(${(1 - clubSectionsFade) * 6}px)`,
+    pointerEvents: clubSectionsFade > 0.96 ? 'auto' : 'none',
   }
 
   return (
@@ -371,7 +390,7 @@ function App() {
           <div className="story-flow">
             <div className="story-row story-row--left">
               <article
-                className="story-panel phase-panel"
+                className="story-panel"
                 style={leftStoryStyle}
               >
                 <p className="about-kicker">astroCET</p>
@@ -386,7 +405,7 @@ function App() {
 
             <div className="story-row story-row--right">
               <article
-                className="story-panel phase-panel"
+                className="story-panel"
                 style={rightStoryStyle}
               >
                 <p className="about-kicker">Our Focus</p>
@@ -400,65 +419,23 @@ function App() {
             </div>
           </div>
 
-          <div className="club-grid" style={clubGridStyle}>
-            <article
-              id="events"
-              data-reveal-id="events"
-              className={`club-card reveal ${visibleSections['events'] ? 'is-visible' : ''}`}
-              style={{ '--delay': '260ms' }}
-            >
-              <p className="about-kicker">Events</p>
-              <h3>Past Events & Announcements</h3>
-              <p>
-                AstroCET hosts night-sky observations, introductory astronomy
-                sessions, and regular announcements for upcoming activities.
-              </p>
-            </article>
-
-            <article
-              id="blogs"
-              data-reveal-id="blogs"
-              className={`club-card reveal ${visibleSections['blogs'] ? 'is-visible' : ''}`}
-              style={{ '--delay': '320ms' }}
-            >
-              <p className="about-kicker">Blogs</p>
-              <h3>Knowledge from the club</h3>
-              <p>
-                Members publish astronomy notes and explainers to help beginners
-                and enthusiasts stay connected with what we learn.
-              </p>
-            </article>
-
-            <article
-              id="team"
-              data-reveal-id="team"
-              className={`club-card reveal ${visibleSections['team'] ? 'is-visible' : ''}`}
-              style={{ '--delay': '380ms' }}
-            >
-              <p className="about-kicker">Team</p>
-              <h3>Built by CET students</h3>
-              <p>
-                The club is run by passionate students from CET Trivandrum who
-                work together on astronomy outreach and technical activities.
-              </p>
-            </article>
-
-            <article
-              id="contact"
-              data-reveal-id="contact"
-              className={`club-card reveal ${visibleSections['contact'] ? 'is-visible' : ''}`}
-              style={{ '--delay': '440ms' }}
-            >
-              <p className="about-kicker">Contact Us</p>
-              <h3>Enter your email to subscribe</h3>
-              <form className="contact-form" onSubmit={handleSubscribe}>
-                <input type="email" placeholder="Enter your email" required />
-                <button type="submit">Send</button>
-              </form>
-            </article>
+          <div className="club-sections" style={clubSectionsStyle}>
+            {clubHighlights.map((item, index) => (
+              <article
+                key={item.id}
+                id={item.id}
+                data-reveal-id={`club-${item.id}`}
+                className={`club-item reveal ${visibleSections[`club-${item.id}`] ? 'is-visible' : ''}`}
+                style={{ '--delay': `${260 + index * 90}ms` }}
+              >
+                <p className="about-kicker">{item.kicker}</p>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
+            ))}
           </div>
 
-          <p className="site-credit reveal is-visible">Made by Rohan Kishore. Made with minimal ai slop</p>
+          <p className="site-credit reveal is-visible">Made by AstroCET. All rights reserved.</p>
         </div>
       </section>
     </div>
