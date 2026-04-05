@@ -112,7 +112,7 @@ function MarsModel({ progress }) {
     const isMobile = viewport.width < 8
 
     const targetStartRadius = isMobile ? 3.6 : 5.8
-    const targetEndRadius = isMobile ? 1.3 : 2.45
+    const targetEndRadius = isMobile ? 1.8 : 2.45
     const startScale = targetStartRadius / meshAsset.radius
     const endScale = targetEndRadius / meshAsset.radius
     const xStart = isMobile ? 0 : -0.05
@@ -130,9 +130,9 @@ function MarsModel({ progress }) {
     const toLeft = clamp((t - leftPhaseStart) / (leftPhaseEnd - leftPhaseStart), 0, 1)
     const toCenter = clamp((t - centerPhaseStart) / (centerPhaseEnd - centerPhaseStart), 0, 1)
 
-    const xAtHeroEnd = isMobile ? 0.2 : 0.56
-    const xRight = isMobile ? 1.35 : 2.15
-    const xLeft = isMobile ? -1.35 : -1.95
+    const xAtHeroEnd = isMobile ? 0.0 : 0.56
+    const xRight = isMobile ? 2.5 : 2.15
+    const xLeft = isMobile ? -2.5 : -1.95
 
     const yAtHeroEnd = isMobile ? -0.4 : -0.18
     const yRight = isMobile ? 0.15 : -0.1
