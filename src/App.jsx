@@ -12,6 +12,8 @@ const navItems = [
   { label: 'Team', href: '#team' },
 ]
 
+
+
 const clubHighlights = [
   {
     id: 'events',
